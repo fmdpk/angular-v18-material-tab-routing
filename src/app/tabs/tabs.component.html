@@ -1,0 +1,22 @@
+<div class="tabs-root">
+  <!-- Tab headers: make draggable -->
+  <div cdkDropList (cdkDropListDropped)="drop($event)" class="tab-header-list">
+    <div class="tab-header" *ngFor="let tab of tabsSvc.tabs; let i=index" cdkDrag (click)="activeIndex = i" [class.active]="i===activeIndex">
+      <span class="tab-title">{{tab.title}}</span>
+      <button mat-icon-button (click)="close(tab, i); $event.stopPropagation();" aria-label="Close tab">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- Tab content panes. All instantiated components remain in the DOM. Only CSS toggles visibility -->
+  <div class="tab-content-area">
+    <ng-container *ngFor="let tab of tabsSvc.tabs; let i = index">
+      <div class="tab-pane" [hidden]="i !== activeIndex">
+        <!-- anchor where the lazy component is created. Keep this element present always so component stays in DOM -->
+        <ng-template #anchor></ng-template>
+      </div>
+    </ng-container>
+  </div>
+</div>
