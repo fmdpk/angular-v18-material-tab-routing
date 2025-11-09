@@ -59,12 +59,19 @@ export class TabsStateService {
   }
 
   closeTab(index: number) {
-    const tab = this.tabs[index];
-    this.tabs.splice(index, 1);
-    if (this.activeIndex >= this.tabs.length) {
-      this.activeIndex = Math.max(0, this.tabs.length - 1);
-    }
-    this.router.navigate(['/tabs', { outlets: { [tab.outlet]: null } }]);
+    // const tab = this.tabs[index];
+    // this.tabs.splice(index, 1);
+    // if (this.activeIndex >= this.tabs.length) {
+    //   this.activeIndex = Math.max(0, this.tabs.length - 1);
+    // }
+    // this.router.navigate(['/tabs', { outlets: { [tab.outlet]: null } }]);
+    // this.saveState();
+    const removed = this.tabs.splice(index, 1)[0];
+    const outlets: Record<string, string | null> = {};
+    for (const t of this.tabs) outlets[t.outlet] = t.key;
+    outlets[removed.outlet] = null; // close this outlet
+
+    this.router.navigate(['/tabs', { outlets: { [removed.outlet]: null } }]);
     this.saveState();
   }
 

@@ -5,6 +5,7 @@
 </div>
 
 <mat-tab-group
+  preserveContent
   cdkDropList
   cdkDropListOrientation="horizontal"
   (cdkDropListDropped)="drop($event)"
@@ -14,23 +15,21 @@
   [(selectedIndex)]="tabsSvc.activeIndex"
   (selectedIndexChange)="onActiveChange($event)"
 >
-  <mat-tab
-    *ngFor="let tab of tabsSvc.tabs; let i = index"
-  >
-    <ng-template mat-tab-label>
-        <span
-          cdkDrag
-          cdkDragPreviewClass="example-drag-tabs-preview"
-          cdkDragRootElement=".mat-mdc-tab">{{tab.title}}</span>
-    </ng-template>
-    <div class="tab-toolbar">
-      <span>{{ tab.title }}</span>
-      <button mat-icon-button (click)="close(i)" aria-label="Close tab">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-
-    <!-- Named outlet for this tab -->
-    <router-outlet [name]="tab.outlet"></router-outlet>
-  </mat-tab>
+  @for (tab of tabsSvc.tabs; let i = $index; track i){
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="custom-mat-tab-header-wrapper">
+            <span
+              cdkDrag
+              cdkDragPreviewClass="example-drag-tabs-preview"
+              cdkDragRootElement=".mat-mdc-tab">{{ tab.title }}</span>
+          <button mat-icon-button (click)="$event.stopPropagation();closeTab(i)" aria-label="Close tab">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </ng-template>
+      <!-- Named outlet for this tab -->
+      <router-outlet [name]="tab.outlet"></router-outlet>
+    </mat-tab>
+  }
 </mat-tab-group>

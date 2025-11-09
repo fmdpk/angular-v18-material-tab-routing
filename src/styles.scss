@@ -19,3 +19,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .example-drag-tabs .cdk-drag-placeholder {
   opacity: 0.5;
 }
+
+.custom-mat-tab-header-wrapper{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
