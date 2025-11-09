@@ -5,11 +5,12 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {TabsService} from './tabs/tabs.service';
 import {TabsComponent} from './tabs/tabs.component';
+import {TabsPageComponent} from './tabs-page/tabs-page.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MatToolbarModule, MatButtonModule, MatIconModule, TabsComponent],
+  imports: [RouterOutlet, MatToolbarModule, MatButtonModule, MatIconModule, TabsComponent, TabsPageComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

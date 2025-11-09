@@ -1,0 +1,15 @@
+.tabs-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.tab-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 4px 8px;
+}
+.drag-list {
+  display: flex;
+}

@@ -12,10 +12,11 @@ import {
 } from '@angular/core';
 import {CdkDragDrop, DragDropModule} from '@angular/cdk/drag-drop';
 import {TabInstance, TabsService} from './tabs.service';
-import {isPlatformBrowser, NgForOf} from '@angular/common';
+import {AsyncPipe, isPlatformBrowser, NgForOf} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MatTabsModule} from '@angular/material/tabs';
 
 
 @Component({
@@ -24,8 +25,10 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   imports: [
     NgForOf,
     MatButtonModule,
+    MatTabsModule,
     MatIconModule,
-    DragDropModule
+    DragDropModule,
+    AsyncPipe
   ],
   standalone: true,
   styleUrls: ['./tabs.component.scss'],
@@ -35,7 +38,7 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   // anchors for each tab content. We'll keep these aligned with tabs[] via index.
-  @ViewChildren('anchor', {read: ViewContainerRef}) anchors!: QueryList<ViewContainerRef>;
+  @ViewChildren('tabAnchor', {read: ViewContainerRef}) anchors!: QueryList<ViewContainerRef>;
 
 
   activeIndex = 0;

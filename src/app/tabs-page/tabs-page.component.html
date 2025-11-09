@@ -1,0 +1,33 @@
+<div class="tabs-header">
+  <button mat-button (click)="open('feature-a','Feature A','a')">Feature A</button>
+  <button mat-button (click)="open('feature-b','Feature B','b')">Feature B</button>
+  <button mat-button (click)="open('feature-c','Feature C','c')">Feature C</button>
+</div>
+
+<mat-tab-group
+  [mat-stretch-tabs]="false"
+  [(selectedIndex)]="tabsSvc.activeIndex"
+  (selectedIndexChange)="onActiveChange($event)"
+  animationDuration="0ms"
+>
+  <div
+    cdkDropList
+    class="drag-list"
+    (cdkDropListDropped)="drop($event)"
+  >
+    <mat-tab
+      *ngFor="let tab of tabsSvc.tabs; let i = index"
+      label="{{ tab.title }}"
+    >
+      <div class="tab-toolbar">
+        <span>{{ tab.title }}</span>
+        <button mat-icon-button (click)="close(i)" aria-label="Close tab">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Named outlet for this tab -->
+      <router-outlet [name]="tab.outlet"></router-outlet>
+    </mat-tab>
+  </div>
+</mat-tab-group>

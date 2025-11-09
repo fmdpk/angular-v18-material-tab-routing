@@ -15,6 +15,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(),
     provideAnimationsAsync(),
-    { provide: FEATURE_REGISTRY, useValue: [FeatureAEntry, FeatureBEntry, FeatureCEntry], multi: true }
+    // { provide: FEATURE_REGISTRY, useValue: [FeatureAEntry, FeatureBEntry, FeatureCEntry], multi: true }
   ]
 };
