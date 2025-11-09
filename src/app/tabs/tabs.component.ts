@@ -50,11 +50,12 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
-  ngOnInit() {
+  async ngOnInit() {
     const isBrowser = isPlatformBrowser(this.platformId)
     console.log(isBrowser)
     if(isBrowser){
-      this.tabsSvc.restoreTabs();
+      // this.tabsSvc.restoreTabs();
+      await this.tabsSvc.restoreTabsFromStorageOrRoute();
     }
     this.tabsSvc.activeIndex$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
       this.activeIndex = res

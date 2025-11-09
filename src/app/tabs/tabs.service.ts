@@ -230,4 +230,24 @@ export class TabsService {
     this.activeIndex$.next(this.activeIndex)
     this.syncToRouter();
   }
+
+  async restoreTabsFromStorageOrRoute() {
+    const qp = new URLSearchParams(window.location.search);
+    const routeTabs = qp.get('tabs')?.split(',').filter(Boolean) ?? [];
+    const active = +(qp.get('active') ?? 0);
+
+    let restored = false;
+    if (routeTabs.length) {
+      for (const key of routeTabs) {
+        await this.openFeature(key, ['admin'],false);
+      }
+      this.activeIndex = active;
+      this.activeIndex$.next(this.activeIndex)
+      restored = true;
+    }
+
+    if (!restored) {
+      await this.restoreTabs();
+    }
+  }
 }
