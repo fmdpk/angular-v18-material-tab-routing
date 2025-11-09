@@ -48,6 +48,15 @@ export class TabsPageComponent implements OnInit{
 
   drop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.tabsSvc.tabs, event.previousIndex, event.currentIndex);
+    // update activeIndex if needed
+    if (this.tabsSvc.activeIndex === event.previousIndex) {
+      this.tabsSvc.activeIndex = event.currentIndex;
+    } else if (
+      this.tabsSvc.activeIndex > Math.min(event.previousIndex, event.currentIndex) &&
+      this.tabsSvc.activeIndex <= Math.max(event.previousIndex, event.currentIndex)
+    ) {
+      this.tabsSvc.activeIndex += event.previousIndex < event.currentIndex ? -1 : 1;
+    }
     this.tabsSvc.saveState();
   }
 }

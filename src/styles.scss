@@ -2,3 +2,20 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.example-drag-tabs.cdk-drop-list-dragging {
+  pointer-events: none;
+}
+
+.example-drag-tabs-preview.cdk-drag-animating {
+  transition: all 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.mat-mdc-tab.example-drag-tabs-preview {
+  outline: dashed 1px #ccc;
+  border-radius: 8px;
+  outline-offset: 4px;
+}
+
+.example-drag-tabs .cdk-drag-placeholder {
+  opacity: 0.5;
+}
