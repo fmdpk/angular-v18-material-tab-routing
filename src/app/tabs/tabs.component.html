@@ -1,7 +1,7 @@
 <div class="tabs-root">
   <!-- Tab headers: make draggable -->
   <div cdkDropList (cdkDropListDropped)="drop($event)" class="tab-header-list">
-    <div class="tab-header" *ngFor="let tab of tabsSvc.tabs; let i=index" cdkDrag (click)="activeIndex = i"
+    <div class="tab-header" *ngFor="let tab of tabsSvc.tabs; let i=index" cdkDrag (click)="getActiveIndex(i)"
          [class.active]="i===activeIndex">
       <span class="tab-title">{{ tab.title }}</span>
       <button mat-icon-button (click)="$event.stopPropagation(); close(tab, i)" aria-label="Close tab">

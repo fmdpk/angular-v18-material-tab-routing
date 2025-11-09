@@ -8,13 +8,14 @@ import {
   AfterViewInit,
   ComponentRef,
   TemplateRef,
-  ElementRef, EnvironmentInjector, Inject, PLATFORM_ID,
+  ElementRef, EnvironmentInjector, Inject, PLATFORM_ID, DestroyRef,
 } from '@angular/core';
 import {CdkDragDrop, DragDropModule} from '@angular/cdk/drag-drop';
 import {TabInstance, TabsService} from './tabs.service';
 import {isPlatformBrowser, NgForOf} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 
 @Component({
@@ -40,7 +41,12 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
   activeIndex = 0;
 
 
-  constructor(public tabsSvc: TabsService, private rootEnv: EnvironmentInjector, @Inject(PLATFORM_ID) private platformId: typeof PLATFORM_ID) {
+  constructor(
+    public tabsSvc: TabsService,
+    private rootEnv: EnvironmentInjector,
+    @Inject(PLATFORM_ID) private platformId: typeof PLATFORM_ID,
+    private destroyRef: DestroyRef
+  ) {
   }
 
 
@@ -50,7 +56,14 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
     if(isBrowser){
       this.tabsSvc.restoreTabs();
     }
+    this.setActiveIndex()
     // this.tabs = this.tabsSvc.tabs;
+  }
+
+  setActiveIndex(){
+    this.tabsSvc.activeIndex$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: number) => {
+      this.activeIndex = res
+    })
   }
 
 
@@ -90,6 +103,10 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
   close(tab: TabInstance, index: number) {
     const wasActive = this.activeIndex === index;
     this.tabsSvc.closeTab(tab);
+  }
+
+  getActiveIndex(index: number){
+    this.tabsSvc.setActiveIndex(index)
   }
 
   ngOnDestroy() {

@@ -83,6 +83,7 @@ import {
   createEnvironmentInjector,
 } from '@angular/core';
 import {FeatureRegistryService} from '../core/feature-registry.service';
+import {BehaviorSubject} from 'rxjs';
 
 export interface TabInstance {
   id: string;
@@ -96,7 +97,7 @@ export interface TabInstance {
 @Injectable({providedIn: 'root'})
 export class TabsService {
   tabs: TabInstance[] = [];
-  activeIndex = 0;
+  activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   private readonly STORAGE_KEY = 'openTabsState';
 
   constructor(private featureRegistry: FeatureRegistryService, private rootEnv: EnvironmentInjector) {
@@ -105,7 +106,7 @@ export class TabsService {
 
   private persistTabs() {
     const data = {
-      activeIndex: this.activeIndex,
+      activeIndex: this.activeIndex$.getValue(),
       tabs: this.tabs.map(t => ({ id: t.id, key: t.key, title: t.title })),
     };
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
@@ -123,7 +124,7 @@ export class TabsService {
         restored.title = t.title;
       }
       console.log(tabs)
-      this.activeIndex = activeIndex ?? 0;
+      this.activeIndex$.next(activeIndex ?? 0)
     } catch (err) {
       console.warn('Failed to restore tabs:', err);
       localStorage.removeItem(this.STORAGE_KEY);
@@ -134,7 +135,7 @@ export class TabsService {
     const existing = this.tabs.find(t => t.key === key);
     console.log(existing)
     if (existing) {
-      this.activeIndex = this.tabs.indexOf(existing);
+      this.activeIndex$.next(this.tabs.indexOf(existing))
       if (persist) this.persistTabs();
       return existing;
     };
@@ -174,7 +175,7 @@ export class TabsService {
     console.log(tab)
 
     this.tabs.push(tab);
-    this.activeIndex = this.tabs.length - 1;
+    this.activeIndex$.next(this.tabs.length - 1)
 
     if (persist) this.persistTabs();
 
@@ -189,8 +190,8 @@ export class TabsService {
     this.tabs.splice(idx, 1);
 
     // Adjust active index safely
-    if (this.activeIndex >= this.tabs.length) {
-      this.activeIndex = Math.max(0, this.tabs.length - 1);
+    if (this.activeIndex$.getValue() >= this.tabs.length) {
+      this.activeIndex$.next(Math.max(0, this.tabs.length - 1))
     }
 
     this.persistTabs();
@@ -203,7 +204,7 @@ export class TabsService {
   }
 
   setActiveIndex(index: number) {
-    this.activeIndex = index;
+    this.activeIndex$.next(index)
     this.persistTabs();
   }
 }
