@@ -83,6 +83,8 @@ import {
   createEnvironmentInjector,
 } from '@angular/core';
 import {FeatureRegistryService} from '../core/feature-registry.service';
+import {Router} from '@angular/router';
+import {BehaviorSubject} from 'rxjs';
 
 export interface TabInstance {
   id: string;
@@ -97,18 +99,20 @@ export interface TabInstance {
 export class TabsService {
   tabs: TabInstance[] = [];
   activeIndex = 0;
+  activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(0)
   private readonly STORAGE_KEY = 'openTabsState';
 
-  constructor(private featureRegistry: FeatureRegistryService, private rootEnv: EnvironmentInjector) {
+  constructor(private featureRegistry: FeatureRegistryService, private rootEnv: EnvironmentInjector, private router: Router) {
 
   }
 
-  private persistTabs() {
+  private persistTabs(changeRoute: boolean = false) {
     const data = {
       activeIndex: this.activeIndex,
       tabs: this.tabs.map(t => ({ id: t.id, key: t.key, title: t.title })),
     };
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+    if(changeRoute) this.syncToRouter()
   }
 
   async restoreTabs() {
@@ -124,6 +128,7 @@ export class TabsService {
       }
       console.log(tabs)
       this.activeIndex = activeIndex ?? 0;
+      this.activeIndex$.next(this.activeIndex)
     } catch (err) {
       console.warn('Failed to restore tabs:', err);
       localStorage.removeItem(this.STORAGE_KEY);
@@ -135,7 +140,8 @@ export class TabsService {
     console.log(existing)
     if (existing) {
       this.activeIndex = this.tabs.indexOf(existing);
-      if (persist) this.persistTabs();
+      this.activeIndex$.next(this.activeIndex)
+      if (persist) this.persistTabs(true);
       return existing;
     };
 
@@ -175,11 +181,27 @@ export class TabsService {
 
     this.tabs.push(tab);
     this.activeIndex = this.tabs.length - 1;
+    this.activeIndex$.next(this.activeIndex)
 
-    if (persist) this.persistTabs();
+    if (persist) this.persistTabs(true);
 
 
     return tab;
+  }
+
+  private syncToRouter() {
+    let params = null
+    if(this.tabs.length){
+      params = {
+        tabs: this.tabs.map(t => t.key).join(','),
+        active: this.activeIndex,
+      };
+    }
+    this.router.navigate([], {
+      queryParams: params,
+      queryParamsHandling: this.tabs.length ? 'merge' : 'replace',
+      replaceUrl: true,
+    });
   }
 
   closeTab(tab: TabInstance) {
@@ -191,9 +213,10 @@ export class TabsService {
     // Adjust active index safely
     if (this.activeIndex >= this.tabs.length) {
       this.activeIndex = Math.max(0, this.tabs.length - 1);
+      this.activeIndex$.next(this.activeIndex)
     }
 
-    this.persistTabs();
+    this.persistTabs(true);
   }
 
   moveTab(previousIndex: number, currentIndex: number) {
@@ -204,6 +227,7 @@ export class TabsService {
 
   setActiveIndex(index: number) {
     this.activeIndex = index;
-    this.persistTabs();
+    this.activeIndex$.next(this.activeIndex)
+    this.syncToRouter();
   }
 }

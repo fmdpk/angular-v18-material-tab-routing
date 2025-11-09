@@ -8,13 +8,14 @@ import {
   AfterViewInit,
   ComponentRef,
   TemplateRef,
-  ElementRef, EnvironmentInjector, Inject, PLATFORM_ID,
+  ElementRef, EnvironmentInjector, Inject, PLATFORM_ID, DestroyRef,
 } from '@angular/core';
 import {CdkDragDrop, DragDropModule} from '@angular/cdk/drag-drop';
 import {TabInstance, TabsService} from './tabs.service';
 import {isPlatformBrowser, NgForOf} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 
 @Component({
@@ -40,7 +41,12 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
   activeIndex = 0;
 
 
-  constructor(public tabsSvc: TabsService, private rootEnv: EnvironmentInjector, @Inject(PLATFORM_ID) private platformId: typeof PLATFORM_ID) {
+  constructor(
+    public tabsSvc: TabsService,
+    private rootEnv: EnvironmentInjector,
+    private destroyRef: DestroyRef,
+    @Inject(PLATFORM_ID) private platformId: typeof PLATFORM_ID
+  ) {
   }
 
 
@@ -50,13 +56,20 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
     if(isBrowser){
       this.tabsSvc.restoreTabs();
     }
+    this.tabsSvc.activeIndex$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
+      this.activeIndex = res
+    })
     // this.tabs = this.tabsSvc.tabs;
+  }
+
+  getActiveIndex(i: number){
+    this.tabsSvc.setActiveIndex(i)
   }
 
 
   ngAfterViewInit() {
     // When anchors change (e.g. new tab added) try to create component if missing
-    this.anchors.changes.subscribe(() => this.instantiateMissing());
+    this.anchors.changes.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.instantiateMissing());
 
     // initial instantiate
     // setTimeout(() => this.instantiateMissing());
