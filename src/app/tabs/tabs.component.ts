@@ -8,11 +8,11 @@ import {
   AfterViewInit,
   ComponentRef,
   TemplateRef,
-  ElementRef, EnvironmentInjector,
+  ElementRef, EnvironmentInjector, Inject, PLATFORM_ID,
 } from '@angular/core';
 import {CdkDragDrop, DragDropModule} from '@angular/cdk/drag-drop';
 import {TabInstance, TabsService} from './tabs.service';
-import {NgForOf} from '@angular/common';
+import {isPlatformBrowser, NgForOf} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 
@@ -40,11 +40,16 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
   activeIndex = 0;
 
 
-  constructor(public tabsSvc: TabsService, private rootEnv: EnvironmentInjector) {
+  constructor(public tabsSvc: TabsService, private rootEnv: EnvironmentInjector, @Inject(PLATFORM_ID) private platformId: typeof PLATFORM_ID) {
   }
 
 
   ngOnInit() {
+    const isBrowser = isPlatformBrowser(this.platformId)
+    console.log(isBrowser)
+    if(isBrowser){
+      this.tabsSvc.restoreTabs();
+    }
     // this.tabs = this.tabsSvc.tabs;
   }
 
@@ -52,8 +57,9 @@ export class TabsComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     // When anchors change (e.g. new tab added) try to create component if missing
     this.anchors.changes.subscribe(() => this.instantiateMissing());
+
     // initial instantiate
-    setTimeout(() => this.instantiateMissing());
+    // setTimeout(() => this.instantiateMissing());
   }
 
 

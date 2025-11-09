@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FeatureAService {
   counter = 0
   message = 'Hello from FeatureAService (scoped to its feature injector)!';

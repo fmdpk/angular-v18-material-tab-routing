@@ -8,8 +8,8 @@ export const FeatureCEntry: FeatureEntry = {
   providers: FEATURE_C_PROVIDERS,
   requiredRoles: ['admin', 'power-user'],
   canActivate: (roles) => roles.includes('admin'),
-  enabled: async () => {
-    const config = await fetch('/api/feature-flags').then(r => r.json());
-    return config['feature-c-enabled'] === true;
-  },
+  // enabled: async () => {
+  //   const config = await fetch('/api/feature-flags').then(r => r.json());
+  //   return config['feature-c-enabled'] === true;
+  // },
 };

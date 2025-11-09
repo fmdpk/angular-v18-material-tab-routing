@@ -96,15 +96,51 @@ export interface TabInstance {
 @Injectable({providedIn: 'root'})
 export class TabsService {
   tabs: TabInstance[] = [];
+  activeIndex = 0;
+  private readonly STORAGE_KEY = 'openTabsState';
 
   constructor(private featureRegistry: FeatureRegistryService, private rootEnv: EnvironmentInjector) {
+
   }
 
-  async openFeature(key: string, userRoles: string[] = []): Promise<TabInstance> {
+  private persistTabs() {
+    const data = {
+      activeIndex: this.activeIndex,
+      tabs: this.tabs.map(t => ({ id: t.id, key: t.key, title: t.title })),
+    };
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+  }
+
+  async restoreTabs() {
+    const saved = localStorage.getItem(this.STORAGE_KEY);
+    if (!saved) return;
+
+    try {
+      const { tabs, activeIndex } = JSON.parse(saved);
+      for (const t of tabs) {
+        const restored = await this.openFeature(t.key, ['admin'],false);
+        restored.id = t.id;
+        restored.title = t.title;
+      }
+      console.log(tabs)
+      this.activeIndex = activeIndex ?? 0;
+    } catch (err) {
+      console.warn('Failed to restore tabs:', err);
+      localStorage.removeItem(this.STORAGE_KEY);
+    }
+  }
+
+  async openFeature(key: string, userRoles: string[] = [], persist = true): Promise<TabInstance> {
     const existing = this.tabs.find(t => t.key === key);
-    if (existing) return existing;
+    console.log(existing)
+    if (existing) {
+      this.activeIndex = this.tabs.indexOf(existing);
+      if (persist) this.persistTabs();
+      return existing;
+    };
 
     const feature = this.featureRegistry.find(key);
+    console.log(feature)
     if (!feature) throw new Error(`Unknown feature: ${key}`);
 
     // Permission check
@@ -135,20 +171,39 @@ export class TabsService {
     if (feature.providers) {
       tab.injector = createEnvironmentInjector(feature.providers, this.rootEnv);
     }
+    console.log(tab)
 
     this.tabs.push(tab);
+    this.activeIndex = this.tabs.length - 1;
+
+    if (persist) this.persistTabs();
+
+
     return tab;
   }
 
   closeTab(tab: TabInstance) {
     tab.componentRef?.destroy();
     tab.injector?.destroy();
-    this.tabs = this.tabs.filter(t => t.id !== tab.id);
+    const idx = this.tabs.indexOf(tab);
+    this.tabs.splice(idx, 1);
+
+    // Adjust active index safely
+    if (this.activeIndex >= this.tabs.length) {
+      this.activeIndex = Math.max(0, this.tabs.length - 1);
+    }
+
+    this.persistTabs();
   }
 
   moveTab(previousIndex: number, currentIndex: number) {
     if (previousIndex === currentIndex) return;
     const tab = this.tabs.splice(previousIndex, 1)[0];
     this.tabs.splice(currentIndex, 0, tab);
+  }
+
+  setActiveIndex(index: number) {
+    this.activeIndex = index;
+    this.persistTabs();
   }
 }

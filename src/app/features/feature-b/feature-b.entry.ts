@@ -8,7 +8,7 @@ export const FeatureBEntry: FeatureEntry = {
   providers: FEATURE_B_PROVIDERS,
   requiredRoles: ['admin', 'power-user'],
   // canActivate: (roles) => roles.includes('admin'),
-  canActivate: async (roles) => {
+  canActivate: (roles) => {
 
     // If you have API call to check access
     // const resp = await fetch('/api/check-access?feature=feature-b');
