@@ -1,5 +1,4 @@
 import {Routes} from '@angular/router';
-import {UnsavedChangesGuard} from './guards/unsaved-changes.guard';
 
 export const routes: Routes = [
   {
