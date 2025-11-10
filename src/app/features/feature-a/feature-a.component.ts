@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, signal} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {FeatureAService} from '../../core/services/feature-a.service';
 import {CanDeactivateComponent} from '../../guards/unsaved-changes.guard';
 import {FormsModule} from '@angular/forms';
@@ -12,7 +12,7 @@ import {FormsModule} from '@angular/forms';
   templateUrl: './feature-a.component.html',
   styleUrl: './feature-a.component.scss'
 })
-export class FeatureAComponent implements OnInit, CanDeactivateComponent {
+export class FeatureAComponent implements OnInit, CanDeactivateComponent, OnDestroy {
   title = signal('feature-a')
   svc = inject(FeatureAService);
   formValue = '';
@@ -28,5 +28,9 @@ export class FeatureAComponent implements OnInit, CanDeactivateComponent {
 
   canDeactivate(): boolean {
     return this.formValue === this.savedValue; // false = unsaved changes
+  }
+
+  ngOnDestroy() {
+    console.log('FeatureAComponent Destroyed')
   }
 }

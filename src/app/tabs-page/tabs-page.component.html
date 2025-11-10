@@ -1,35 +1,65 @@
 <div class="tabs-header">
-  <button mat-button (click)="open('feature-a','Feature A','a')">Feature A</button>
-  <button mat-button (click)="open('feature-b','Feature B','b')">Feature B</button>
-  <button mat-button (click)="open('feature-c','Feature C','c')">Feature C</button>
+  <button
+    mat-button
+    (click)="
+      open('feature-a', 'Feature A', FeatureAComponent, '/tabs/feature-a')
+    "
+  >
+    Feature A
+  </button>
+  <button
+    mat-button
+    (click)="
+      open('feature-b', 'Feature B', FeatureBComponent, '/tabs/feature-b')
+    "
+  >
+    Feature B
+  </button>
+  <button
+    mat-button
+    (click)="
+      open('feature-c', 'Feature C', FeatureCComponent, '/tabs/feature-c')
+    "
+  >
+    Feature C
+  </button>
 </div>
 
 <mat-tab-group
-  preserveContent
   cdkDropList
   cdkDropListOrientation="horizontal"
   (cdkDropListDropped)="drop($event)"
   cdkDropListElementContainer=".mat-mdc-tab-labels"
   class="example-drag-tabs"
   [mat-stretch-tabs]="false"
-  [(selectedIndex)]="tabsSvc.activeIndex"
+  [(selectedIndex)]="activeIndex"
+  (selectedTabChange)="getSelectedTab($event)"
   (selectedIndexChange)="onActiveChange($event)"
 >
-  @for (tab of tabsSvc.tabs; let i = $index; track i){
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <div class="custom-mat-tab-header-wrapper">
-            <span
-              cdkDrag
-              cdkDragPreviewClass="example-drag-tabs-preview"
-              cdkDragRootElement=".mat-mdc-tab">{{ tab.title }}</span>
-          <button mat-icon-button (click)="$event.stopPropagation();closeTab(i)" aria-label="Close tab">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-      </ng-template>
-      <!-- Named outlet for this tab -->
-      <router-outlet [name]="tab.outlet"></router-outlet>
-    </mat-tab>
+  @for (tab of tabs; let i = $index; track tab.title) {
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div class="custom-mat-tab-header-wrapper">
+        <span
+          cdkDrag
+          cdkDragPreviewClass="example-drag-tabs-preview"
+          cdkDragRootElement=".mat-mdc-tab"
+          >{{ tab.title }}</span
+        >
+        <button
+          mat-icon-button
+          (click)="$event.stopPropagation(); closeTab(i)"
+          aria-label="Close tab"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </ng-template>
+    <app-material-tab-content
+      [componentData]="tab.data"
+      [componentType]="tab.component"
+    ></app-material-tab-content>
+    <!-- <router-outlet *ngIf="tab.isDetail"></router-outlet> -->
+  </mat-tab>
   }
 </mat-tab-group>

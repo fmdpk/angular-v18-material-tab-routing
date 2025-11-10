@@ -1,1 +1,5 @@
-<p>feature-b works!</p>
+<ul style="width: max-content">
+  @for(item of list; track item.key; let i = $index){
+    <li style="cursor: pointer" (click)="goToDetail(item, i)">{{item.title}}</li>
+  }
+</ul>
