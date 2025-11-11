@@ -36,7 +36,7 @@
   (selectedTabChange)="getSelectedTab($event)"
   (selectedIndexChange)="onActiveChange($event)"
 >
-  @for (tab of tabs; let i = $index; track tab.title) {
+  @for (tab of tabs; let i = $index; track tab.key) {
     <mat-tab>
       <ng-template mat-tab-label>
         <div class="custom-mat-tab-header-wrapper">
@@ -55,10 +55,12 @@
           </button>
         </div>
       </ng-template>
-      <app-material-tab-content
-        [componentData]="tab.data"
-        [componentType]="tab.component"
-      ></app-material-tab-content>
+      @defer (when tabs.length){
+        <app-material-tab-content
+          [componentData]="tab.data"
+          [componentType]="tab.component"
+        ></app-material-tab-content>
+      }
       <!-- <router-outlet *ngIf="tab.isDetail"></router-outlet> -->
     </mat-tab>
   }

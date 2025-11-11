@@ -17,18 +17,18 @@ export class FeatureBComponent {
   tabsStateService: TabsStateService = inject(TabsStateService);
   list: TabInfo[] = [
     {
-      key: 'item 1',
+      key: 'item-1',
       title: 'Item 1',
       route: '/tabs/feature-b/1',
-      component: 'FeatureBDetailsComponent',
+      component: '',
       isDetail: true,
       data: {},
     },
     {
-      key: 'item 2',
-      title: 'item 2',
+      key: 'item-2',
+      title: 'Item 2',
       route: '/tabs/feature-b/2',
-      component: 'FeatureBDetailsComponent',
+      component: '',
       isDetail: true,
       data: {},
     },

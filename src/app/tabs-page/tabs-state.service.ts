@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import {inject, Injectable, PLATFORM_ID} from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+import {isPlatformBrowser} from '@angular/common';
 
 export interface TabInfo {
   key: string; // feature key
@@ -18,6 +19,7 @@ export class TabsStateService {
   preventOpenTab$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
   private readonly STORAGE_KEY = 'app:mat-tabs-state';
+  readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(private router: Router) {}
 
@@ -35,13 +37,15 @@ export class TabsStateService {
   }
 
   saveState() {
-    localStorage.setItem(
-      this.STORAGE_KEY,
-      JSON.stringify({
-        tabs: this.tabs$.getValue(),
-        activeIndex: this.activeIndex$.getValue(),
-      })
-    );
+    if(this.isBrowser){
+      localStorage.setItem(
+        this.STORAGE_KEY,
+        JSON.stringify({
+          tabs: this.tabs$.getValue(),
+          activeIndex: this.activeIndex$.getValue(),
+        })
+      );
+    }
   }
 
   async openTab(data: {
@@ -52,6 +56,7 @@ export class TabsStateService {
     isDetail: boolean,
     data: any
   }) {
+    console.log(data)
     const existing = this.tabs$.getValue().find((t) => t.key === data.key);
     if (!existing) {
       let tabs = this.tabs$.getValue();

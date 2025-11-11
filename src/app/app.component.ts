@@ -1,10 +1,11 @@
-import {Component, inject, Type} from '@angular/core';
+import {Component, inject, OnInit, Type} from '@angular/core';
 import {ActivationEnd, ActivationStart, NavigationEnd, NavigationSkipped, Router, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {TabsPageComponent} from './tabs-page/tabs-page.component';
 import {TabInfo, TabsStateService} from './tabs-page/tabs-state.service';
+import {MENU_ITEM_INTERFACE, MENU_ITEMS} from './core/data/menu-items';
 
 @Component({
   selector: 'app-root',
@@ -18,29 +19,57 @@ import {TabInfo, TabsStateService} from './tabs-page/tabs-state.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'angular-v18-material-tab-routing';
   router = inject(Router);
   tabsStateService = inject(TabsStateService);
+  menuItems: MENU_ITEM_INTERFACE[] = JSON.parse(JSON.stringify(MENU_ITEMS))
 
   ngOnInit() {
     let component: Type<any> | null = null
-    this.router.events.subscribe( (res) => {
+    this.router.events.subscribe((res) => {
       if (res instanceof ActivationEnd) {
-        if(!res.snapshot.firstChild){
+        if (!res.snapshot.firstChild) {
           component = res?.snapshot?.component
-          const componentInstance = res?.snapshot?.component;
-          console.log('Activated route component type:', componentInstance);
         }
       } else if (res instanceof NavigationEnd) {
         let data: TabInfo = JSON.parse(JSON.stringify(this.tabsStateService.tabData$.getValue()))
         if (data && !this.tabsStateService.preventOpenTab$.getValue()) {
           data.component = component
           this.tabsStateService.openTab(data)
-        } else if(this.tabsStateService.preventOpenTab$.getValue()){
+        } else if (!data && !this.tabsStateService.preventOpenTab$.getValue()) {
+          this.createTabOnPageLoad(component, res.url)
+        } else if (this.tabsStateService.preventOpenTab$.getValue()) {
           this.tabsStateService.preventOpenTab$.next(false)
         }
       }
     });
+  }
+
+  createTabOnPageLoad(component: any, url: string) {
+    this.menuItems.forEach(item => {
+      if (item.route.includes(url) && !item.children) {
+        this.openTab(item, component)
+      }
+      else if(item.children.length){
+        item.children.forEach(child => {
+          if (url.includes(child.route)) {
+            let split = url.split(child.route)
+            const key: string = child.param!
+            child.data = {
+              [key]: split[1]
+            }
+            child.key = child.key + '-' + split[1]
+            child.title = child.title + ' ' + split[1]
+            this.openTab(child, component)
+          }
+        })
+      }
+    })
+  }
+
+  openTab(item: MENU_ITEM_INTERFACE, component: any){
+    item.component = component
+    this.tabsStateService.openTab(item)
   }
 }
