@@ -10,7 +10,8 @@ import {FormsModule} from '@angular/forms';
     FormsModule
   ],
   templateUrl: './feature-a.component.html',
-  styleUrl: './feature-a.component.scss'
+  styleUrl: './feature-a.component.scss',
+  providers: [FeatureAService],
 })
 export class FeatureAComponent implements OnInit, CanDeactivateComponent, OnDestroy {
   title = signal('feature-a')

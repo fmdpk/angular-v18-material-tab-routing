@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
+import {Component, DestroyRef, inject, Input, NgZone, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
@@ -16,6 +16,7 @@ export class FeatureBDetailsComponent implements OnInit {
   @Input('title') title: any;
   @Input('data') data: any;
   activatedRoute = inject(ActivatedRoute);
+  ngZone = inject(NgZone);
   // activatedRouteSnapshot = inject(ActivatedRouteSnapshot);
   destroyRef = inject(DestroyRef);
   dialog = inject(MatDialog);

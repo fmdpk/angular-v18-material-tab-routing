@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 export interface TabInfo {
   key: string; // feature key
   title: string;
-  component: any; // router outlet name
+  component: any;
   route: string;
   isDetail: boolean;
   data: any;
@@ -14,6 +14,8 @@ export interface TabInfo {
 @Injectable({ providedIn: 'root' })
 export class TabsStateService {
   tabs$: BehaviorSubject<TabInfo[]> = new BehaviorSubject<TabInfo[]>([]);
+  tabData$: BehaviorSubject<TabInfo | null> = new BehaviorSubject<TabInfo | null>(null);
+  preventOpenTab$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
   private readonly STORAGE_KEY = 'app:mat-tabs-state';
 
@@ -42,18 +44,18 @@ export class TabsStateService {
     );
   }
 
-  async openTab(
+  async openTab(data: {
     key: string,
     title: string,
     component: any,
     route: string,
-    isDetail: boolean = false,
+    isDetail: boolean,
     data: any
-  ) {
-    const existing = this.tabs$.getValue().find((t) => t.key === key);
+  }) {
+    const existing = this.tabs$.getValue().find((t) => t.key === data.key);
     if (!existing) {
       let tabs = this.tabs$.getValue();
-      tabs.push({ key, title, component, route, isDetail, data });
+      tabs.push({ key: data.key, title: data.title, component: data.component, route: data.route, isDetail: data.isDetail, data: data.data });
       this.tabs$.next(tabs);
       this.activeIndex$.next(tabs.length - 1);
     } else {

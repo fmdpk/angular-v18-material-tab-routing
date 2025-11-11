@@ -2,5 +2,5 @@
 <mat-dialog-content>{{ data.message }}</mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button (click)="close(false)">Cancel</button>
-  <button mat-raised-button color="warn" (click)="close(true)">Close Tab</button>
+  <button mat-raised-button color="warn" (click)="close(true)" cdkFocusInitial>Close Tab</button>
 </mat-dialog-actions>

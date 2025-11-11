@@ -2,7 +2,7 @@
   <button
     mat-button
     (click)="
-      open('feature-a', 'Feature A', FeatureAComponent, '/tabs/feature-a')
+      open('feature-a', 'Feature A', 'FeatureAComponent', '/tabs/feature-a')
     "
   >
     Feature A
@@ -10,7 +10,7 @@
   <button
     mat-button
     (click)="
-      open('feature-b', 'Feature B', FeatureBComponent, '/tabs/feature-b')
+      open('feature-b', 'Feature B', 'FeatureBComponent', '/tabs/feature-b')
     "
   >
     Feature B
@@ -18,7 +18,7 @@
   <button
     mat-button
     (click)="
-      open('feature-c', 'Feature C', FeatureCComponent, '/tabs/feature-c')
+      open('feature-c', 'Feature C', 'FeatureCComponent', '/tabs/feature-c')
     "
   >
     Feature C
@@ -37,29 +37,29 @@
   (selectedIndexChange)="onActiveChange($event)"
 >
   @for (tab of tabs; let i = $index; track tab.title) {
-  <mat-tab>
-    <ng-template mat-tab-label>
-      <div class="custom-mat-tab-header-wrapper">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="custom-mat-tab-header-wrapper">
         <span
           cdkDrag
           cdkDragPreviewClass="example-drag-tabs-preview"
           cdkDragRootElement=".mat-mdc-tab"
-          >{{ tab.title }}</span
+        >{{ tab.title }}</span
         >
-        <button
-          mat-icon-button
-          (click)="$event.stopPropagation(); closeTab(i)"
-          aria-label="Close tab"
-        >
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-    </ng-template>
-    <app-material-tab-content
-      [componentData]="tab.data"
-      [componentType]="tab.component"
-    ></app-material-tab-content>
-    <!-- <router-outlet *ngIf="tab.isDetail"></router-outlet> -->
-  </mat-tab>
+          <button
+            mat-icon-button
+            (click)="$event.stopPropagation(); closeTab(i)"
+            aria-label="Close tab"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </ng-template>
+      <app-material-tab-content
+        [componentData]="tab.data"
+        [componentType]="tab.component"
+      ></app-material-tab-content>
+      <!-- <router-outlet *ngIf="tab.isDetail"></router-outlet> -->
+    </mat-tab>
   }
 </mat-tab-group>

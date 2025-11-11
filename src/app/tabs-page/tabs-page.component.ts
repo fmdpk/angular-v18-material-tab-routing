@@ -16,12 +16,9 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
-import { ChildrenOutletContexts, RouterOutlet } from '@angular/router';
+import {ChildrenOutletContexts, Router, RouterOutlet} from '@angular/router';
 import { TabInfo, TabsStateService } from './tabs-state.service';
 import { MaterialTabContentComponent } from './material-tab-content/material-tab-content.component';
-import { FeatureAComponent } from '../features/feature-a/feature-a.component';
-import { FeatureBComponent } from '../features/feature-b/feature-b.component';
-import { FeatureCComponent } from '../features/feature-c/feature-c.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -36,7 +33,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     RouterOutlet,
     NgIf,
     MaterialTabContentComponent,
-    FeatureBComponent,
   ],
   templateUrl: './tabs-page.component.html',
   styleUrl: './tabs-page.component.scss',
@@ -44,6 +40,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class TabsPageComponent implements OnInit {
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   destroyRef: DestroyRef = inject(DestroyRef);
+  router: Router = inject(Router);
   activeIndex: number = -1;
   tabs: TabInfo[] = [];
 
@@ -71,8 +68,17 @@ export class TabsPageComponent implements OnInit {
     }
   }
 
-  async open(key: string, title: string, component: any, route: string) {
-    await this.tabsSvc.openTab(key, title, component, route, false, {});
+  open(key: string, title: string, component: any, route: string) {
+    // await this.tabsSvc.openTab(key, title, component, route, false, {});
+    this.tabsSvc.tabData$.next({
+      key,
+      title,
+      component,
+      route,
+      isDetail: false,
+      data: {}
+    })
+    this.router.navigateByUrl(route)
   }
 
   closeTab(index: number) {
@@ -88,7 +94,7 @@ export class TabsPageComponent implements OnInit {
     //   const result = await firstValueFrom(guard.canDeactivate(componentInstance));
     //   if (!result) return; // cancel close
     // }
-
+    this.tabsSvc.preventOpenTab$.next(true)
     this.tabsSvc.closeTab(index, this.activeIndex);
   }
 
@@ -121,8 +127,4 @@ export class TabsPageComponent implements OnInit {
   getSelectedTab(event: MatTabChangeEvent) {
     console.log(event);
   }
-
-  protected readonly FeatureAComponent = FeatureAComponent;
-  protected readonly FeatureBComponent = FeatureBComponent;
-  protected readonly FeatureCComponent = FeatureCComponent;
 }

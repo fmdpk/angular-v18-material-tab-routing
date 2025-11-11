@@ -1,16 +1,12 @@
 import {
   AfterViewInit,
   Component,
-  DestroyRef,
-  inject,
   Input,
   OnInit,
   Type,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-material-tab-content',
@@ -25,16 +21,7 @@ export class MaterialTabContentComponent implements AfterViewInit, OnInit {
   @Input() componentType!: Type<any>;
   @Input() componentData: any;
 
-  activatedRoute = inject(ActivatedRoute);
-  destroyRef = inject(DestroyRef);
-
   ngOnInit() {
-    this.activatedRoute.paramMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((res) => {
-        console.log(res);
-        // this.title = res
-      });
   }
 
   ngAfterViewInit() {
