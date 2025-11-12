@@ -47,9 +47,13 @@ export class AppComponent implements OnInit {
   }
 
   createTabOnPageLoad(component: any, url: string) {
+    console.log(component)
+    console.log(url)
+    console.log(this.menuItems)
     this.menuItems.forEach(item => {
-      if (item.route.includes(url) && !item.children) {
+      if (item.route.includes(url) && url.length <= item.route.length) {
         this.openTab(item, component)
+        return
       }
       else if(item.children.length){
         item.children.forEach(child => {
