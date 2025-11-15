@@ -33,7 +33,6 @@ export class MaterialTabContentComponent implements AfterViewInit, OnInit {
     // console.log(this.componentData);
     if (this.componentType) {
       const compRef = this.container.createComponent(this.componentType);
-      console.log(this.router)
       let activeComps = this.tabsStateService.activeComponents$.getValue()
       activeComps.push({
         tabKey: this.tabKey,
