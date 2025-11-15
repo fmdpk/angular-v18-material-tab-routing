@@ -1,9 +1,8 @@
 import {Component, inject, OnInit, Type} from '@angular/core';
-import {ActivationEnd, ActivationStart, NavigationEnd, NavigationSkipped, Router, RouterOutlet} from '@angular/router';
+import {ActivationEnd, NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
-import {TabsPageComponent} from './tabs-page/tabs-page.component';
 import {TabInfo, TabsStateService} from './tabs-page/tabs-state.service';
 import {MENU_ITEM_INTERFACE, MENU_ITEMS} from './core/data/menu-items';
 
