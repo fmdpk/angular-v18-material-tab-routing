@@ -8,20 +8,21 @@ import {
   OnInit,
   PLATFORM_ID,
 } from '@angular/core';
-import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import {MatTabChangeEvent, MatTabsModule} from '@angular/material/tabs';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
 import {
   CdkDragDrop,
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
+import {isPlatformBrowser, NgForOf, NgIf} from '@angular/common';
 import {ActivatedRoute, ActivatedRouteSnapshot, ChildrenOutletContexts, Router, RouterOutlet} from '@angular/router';
-import { TabInfo, TabsStateService } from './tabs-state.service';
-import { MaterialTabContentComponent } from './material-tab-content/material-tab-content.component';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {TabInfo, TabsStateService} from './tabs-state.service';
+import {MaterialTabContentComponent} from './material-tab-content/material-tab-content.component';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {firstValueFrom} from 'rxjs';
+import {UnsavedChangesGuard} from '../guards/unsaved-changes.guard';
 
 @Component({
   selector: 'app-tabs-page',
@@ -51,7 +52,8 @@ export class TabsPageComponent implements OnInit {
   constructor(
     public tabsSvc: TabsStateService,
     @Inject(Injector) private injector: any,
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     if (this.isBrowser) {
@@ -84,50 +86,23 @@ export class TabsPageComponent implements OnInit {
     this.router.navigateByUrl(route)
   }
 
-  async closeTab(index: number) {
-    // const tab = this.tabsSvc.tabs[index];
-    // const outlet = tab.outlet;
-    //
-    // const ctx = this.contexts.getContext(outlet);
-    // console.log(ctx)
-    // const componentInstance = ctx?.outlet?.component as any;
-    // console.log(componentInstance)
-    // if (componentInstance && 'canDeactivate' in componentInstance) {
-    //   const guard = this.injector.get(UnsavedChangesGuard);
-    //   const result = await firstValueFrom(guard.canDeactivate(componentInstance));
-    //   if (!result) return; // cancel close
-    // }
+  async canCLoseTab(tab: TabInfo, index: number) {
+    let foundTab = this.tabsSvc.activeComponents$.getValue().find(item => item.tabKey === tab.key)
+    if ('canDeactivate' in foundTab?.component!) {
+      const guard = this.injector.get(UnsavedChangesGuard);
+      const result = await firstValueFrom(guard.canDeactivate(foundTab?.component))
+      if (result) {
+        this.closeTab(index)
+      }
+    } else {
+      this.closeTab(index)
+    }
 
-    // const currentRoute = this.router.routerState.root;
-    // let route: ActivatedRouteSnapshot = currentRoute.snapshot;
-    //
-    // while (route.firstChild) {
-    //   route = route.firstChild;
-    // }
-    //
-    // const componentInstance = route.component;
-    //
-    // const componentRef = this.router.routerState.root.firstChild?.component;
-    //
-    // if (componentRef && 'canDeactivate' in componentRef) {
-    //   // component has the method
-    //   console.log('canDeactivate in: ',componentRef)
-    // }
-    //
-    // const guards = route.routeConfig?.canDeactivate ?? [];
-    // const guardInstances: any = guards.map(g => this.injector.get(g));
-    // const result = await firstValueFrom(guardInstances.canDeactivate(componentInstance))
-    //
-    // console.log(componentInstance)
-    // console.log(guardInstances)
-    // console.log(result)
-    // console.log(guards)
-    // console.log(componentRef)
-    // console.log(this.router)
-    // console.log(this.activatedRoute)
+  }
 
-    // this.tabsSvc.preventOpenTab$.next(true)
-    // this.tabsSvc.closeTab(index, this.activeIndex);
+  closeTab(index: number) {
+    this.tabsSvc.preventOpenTab$.next(true)
+    this.tabsSvc.closeTab(index);
   }
 
   onActiveChange(index: number) {

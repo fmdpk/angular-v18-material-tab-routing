@@ -1,4 +1,4 @@
-import {inject, Injectable, PLATFORM_ID} from '@angular/core';
+import {inject, Injectable, PLATFORM_ID, Type} from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import {isPlatformBrowser} from '@angular/common';
@@ -12,12 +12,15 @@ export interface TabInfo {
   data: any;
 }
 
+export interface activeTabs {   tabKey: any;   path: string;   component: Type<any>; }
+
 @Injectable({ providedIn: 'root' })
 export class TabsStateService {
   tabs$: BehaviorSubject<TabInfo[]> = new BehaviorSubject<TabInfo[]>([]);
   tabData$: BehaviorSubject<TabInfo | null> = new BehaviorSubject<TabInfo | null>(null);
   preventOpenTab$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
+  activeComponents$: BehaviorSubject<activeTabs[]> = new BehaviorSubject<activeTabs[]>([]);
   private readonly STORAGE_KEY = 'app:mat-tabs-state';
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
@@ -75,7 +78,7 @@ export class TabsStateService {
     this.router.navigate([route]);
   }
 
-  closeTab(itemIndex: number, activeIndex: number) {
+  closeTab(itemIndex: number) {
     let tabs = this.tabs$.getValue();
     this.tabs$.next(tabs.filter((item, index) => index !== itemIndex));
   }

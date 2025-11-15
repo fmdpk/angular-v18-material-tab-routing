@@ -48,7 +48,7 @@
         >
           <button
             mat-icon-button
-            (click)="$event.stopPropagation(); closeTab(i)"
+            (click)="$event.stopPropagation(); canCLoseTab(tab,i)"
             aria-label="Close tab"
           >
             <mat-icon>close</mat-icon>
@@ -57,6 +57,7 @@
       </ng-template>
       @defer (when tabs.length){
         <app-material-tab-content
+          [tabKey]="tab.key"
           [componentData]="tab.data"
           [componentType]="tab.component"
         ></app-material-tab-content>

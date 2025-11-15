@@ -13,6 +13,7 @@ export class UnsavedChangesGuard implements CanDeactivate<CanDeactivateComponent
   constructor(private dialog: MatDialog) {}
 
   canDeactivate(component: CanDeactivateComponent): Observable<boolean> {
+    console.log(component)
     const result = component.canDeactivate();
     if (typeof result === 'boolean') {
       return result ? of(true) : this.confirm();
