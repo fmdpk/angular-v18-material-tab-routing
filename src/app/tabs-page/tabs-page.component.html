@@ -33,7 +33,6 @@
   class="example-drag-tabs"
   [mat-stretch-tabs]="false"
   [(selectedIndex)]="activeIndex"
-  (selectedTabChange)="getSelectedTab($event)"
   (selectedIndexChange)="onActiveChange($event)"
 >
   @for (tab of tabs; let i = $index; track tab.key) {

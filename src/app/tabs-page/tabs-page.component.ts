@@ -118,8 +118,4 @@ export class TabsPageComponent implements OnInit {
       );
     }
   }
-
-  getSelectedTab(event: MatTabChangeEvent) {
-    console.log(event);
-  }
 }
