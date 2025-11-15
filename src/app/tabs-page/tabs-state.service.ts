@@ -75,7 +75,7 @@ export class TabsStateService {
   }
 
   async syncRouter(route: string) {
-    this.router.navigate([route]);
+    await this.router.navigate([route]);
   }
 
   closeTab(itemIndex: number) {

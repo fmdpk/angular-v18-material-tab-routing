@@ -1,5 +1,4 @@
 import {
-  ApplicationRef,
   Component,
   DestroyRef,
   Inject,
@@ -17,7 +16,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import {isPlatformBrowser, NgForOf, NgIf} from '@angular/common';
-import {ActivatedRoute, ActivatedRouteSnapshot, ChildrenOutletContexts, Router, RouterOutlet} from '@angular/router';
+import {Router, RouterOutlet} from '@angular/router';
 import {TabInfo, TabsStateService} from './tabs-state.service';
 import {MaterialTabContentComponent} from './material-tab-content/material-tab-content.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -44,8 +43,6 @@ export class TabsPageComponent implements OnInit {
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   destroyRef: DestroyRef = inject(DestroyRef);
   router: Router = inject(Router);
-  activatedRoute: ActivatedRoute = inject(ActivatedRoute);
-  appRef: ApplicationRef = inject(ApplicationRef);
   activeIndex: number = -1;
   tabs: TabInfo[] = [];
 
@@ -57,12 +54,9 @@ export class TabsPageComponent implements OnInit {
 
   ngOnInit() {
     if (this.isBrowser) {
-      // this.tabsSvc.loadState();
-      // this.tabsSvc.syncRouter();
       this.tabsSvc.tabs$
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((res) => {
-          // console.log(res);
           this.tabs = res;
         });
       this.tabsSvc.activeIndex$
@@ -74,7 +68,6 @@ export class TabsPageComponent implements OnInit {
   }
 
   open(key: string, title: string, component: any, route: string) {
-    // await this.tabsSvc.openTab(key, title, component, route, false, {});
     this.tabsSvc.tabData$.next({
       key,
       title,
@@ -97,7 +90,6 @@ export class TabsPageComponent implements OnInit {
     } else {
       this.closeTab(index)
     }
-
   }
 
   closeTab(index: number) {
@@ -105,17 +97,15 @@ export class TabsPageComponent implements OnInit {
     this.tabsSvc.closeTab(index);
   }
 
-  onActiveChange(index: number) {
-    // console.log(index);
+  async onActiveChange(index: number) {
     this.tabsSvc.activeIndex$.next(index);
     let route = this.tabs[index] ? this.tabs[index].route : '/';
     this.tabsSvc.saveState();
-    this.tabsSvc.syncRouter(route);
+    await this.tabsSvc.syncRouter(route);
   }
 
   drop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.tabs, event.previousIndex, event.currentIndex);
-    // update activeIndex if needed
     if (this.activeIndex === event.previousIndex) {
       this.tabsSvc.activeIndex$.next(event.currentIndex);
     } else if (
