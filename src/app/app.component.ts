@@ -47,15 +47,11 @@ export class AppComponent implements OnInit {
   }
 
   createTabOnPageLoad(component: any, url: string) {
-    console.log(component)
-    console.log(url)
-    console.log(this.menuItems)
     this.menuItems.forEach(item => {
       if (item.route.includes(url) && url.length <= item.route.length) {
         this.openTab(item, component)
         return
-      }
-      else if(item.children.length){
+      } else if (item.children.length) {
         item.children.forEach(child => {
           if (url.includes(child.route)) {
             let split = url.split(child.route)
@@ -72,7 +68,7 @@ export class AppComponent implements OnInit {
     })
   }
 
-  openTab(item: MENU_ITEM_INTERFACE, component: any){
+  openTab(item: MENU_ITEM_INTERFACE, component: any) {
     item.component = component
     this.tabsStateService.openTab(item)
   }
