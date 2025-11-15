@@ -100,7 +100,6 @@ export class TabsPageComponent implements OnInit {
   async onActiveChange(index: number) {
     this.tabsSvc.activeIndex$.next(index);
     let route = this.tabs[index] ? this.tabs[index].route : '/';
-    this.tabsSvc.saveState();
     await this.tabsSvc.syncRouter(route);
   }
 
@@ -118,7 +117,6 @@ export class TabsPageComponent implements OnInit {
           : this.tabsSvc.activeIndex$.getValue() + 1
       );
     }
-    this.tabsSvc.saveState();
   }
 
   getSelectedTab(event: MatTabChangeEvent) {
