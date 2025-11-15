@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import {AuthGuard} from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -10,6 +11,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'feature-a',
+        canActivate: [AuthGuard],
         loadComponent: () =>
           import('./features/feature-a/feature-a.component').then(
             (m) => m.FeatureAComponent
