@@ -26,19 +26,6 @@ export class TabsStateService {
 
   constructor(private router: Router) {}
 
-  loadState() {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (!saved) return;
-    try {
-      const parsed = JSON.parse(saved);
-      this.tabs$.next(parsed.tabs || []);
-      this.activeIndex$.next(parsed.activeIndex ?? 0);
-    } catch {
-      this.tabs$.next([]);
-      this.activeIndex$.next(0);
-    }
-  }
-
   saveState() {
     if(this.isBrowser){
       localStorage.setItem(
@@ -70,7 +57,6 @@ export class TabsStateService {
       this.activeIndex$.next(this.tabs$.getValue().indexOf(existing));
     }
 
-    // await this.syncRouter(route);
     this.saveState();
   }
 
