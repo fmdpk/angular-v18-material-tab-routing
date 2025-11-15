@@ -56,7 +56,7 @@ export class TabsStateService {
     isDetail: boolean,
     data: any
   }) {
-    console.log(data)
+    // console.log(data)
     const existing = this.tabs$.getValue().find((t) => t.key === data.key);
     if (!existing) {
       let tabs = this.tabs$.getValue();

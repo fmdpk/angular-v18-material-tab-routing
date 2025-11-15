@@ -25,12 +25,12 @@ export class MaterialTabContentComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit() {
-    console.log(this.componentData);
+    // console.log(this.componentData);
     if (this.componentType) {
       const compRef = this.container.createComponent(this.componentType);
       if (this.componentData) {
-        console.log(compRef);
-        console.log(compRef.instance);
+        // console.log(compRef);
+        // console.log(compRef.instance);
         compRef.instance.data = this.componentData;
         // Object.assign(compRef.instance.data, this.componentData);
       }

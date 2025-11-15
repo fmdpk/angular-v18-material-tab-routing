@@ -1,4 +1,5 @@
 import {
+  ApplicationRef,
   Component,
   DestroyRef,
   Inject,
@@ -16,10 +17,11 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
-import {ChildrenOutletContexts, Router, RouterOutlet} from '@angular/router';
+import {ActivatedRoute, ActivatedRouteSnapshot, ChildrenOutletContexts, Router, RouterOutlet} from '@angular/router';
 import { TabInfo, TabsStateService } from './tabs-state.service';
 import { MaterialTabContentComponent } from './material-tab-content/material-tab-content.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {firstValueFrom} from 'rxjs';
 
 @Component({
   selector: 'app-tabs-page',
@@ -41,13 +43,14 @@ export class TabsPageComponent implements OnInit {
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   destroyRef: DestroyRef = inject(DestroyRef);
   router: Router = inject(Router);
+  activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+  appRef: ApplicationRef = inject(ApplicationRef);
   activeIndex: number = -1;
   tabs: TabInfo[] = [];
 
   constructor(
     public tabsSvc: TabsStateService,
     @Inject(Injector) private injector: any,
-    private contexts: ChildrenOutletContexts
   ) {}
 
   ngOnInit() {
@@ -57,7 +60,7 @@ export class TabsPageComponent implements OnInit {
       this.tabsSvc.tabs$
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((res) => {
-          console.log(res);
+          // console.log(res);
           this.tabs = res;
         });
       this.tabsSvc.activeIndex$
@@ -81,7 +84,7 @@ export class TabsPageComponent implements OnInit {
     this.router.navigateByUrl(route)
   }
 
-  closeTab(index: number) {
+  async closeTab(index: number) {
     // const tab = this.tabsSvc.tabs[index];
     // const outlet = tab.outlet;
     //
@@ -94,12 +97,41 @@ export class TabsPageComponent implements OnInit {
     //   const result = await firstValueFrom(guard.canDeactivate(componentInstance));
     //   if (!result) return; // cancel close
     // }
-    this.tabsSvc.preventOpenTab$.next(true)
-    this.tabsSvc.closeTab(index, this.activeIndex);
+
+    // const currentRoute = this.router.routerState.root;
+    // let route: ActivatedRouteSnapshot = currentRoute.snapshot;
+    //
+    // while (route.firstChild) {
+    //   route = route.firstChild;
+    // }
+    //
+    // const componentInstance = route.component;
+    //
+    // const componentRef = this.router.routerState.root.firstChild?.component;
+    //
+    // if (componentRef && 'canDeactivate' in componentRef) {
+    //   // component has the method
+    //   console.log('canDeactivate in: ',componentRef)
+    // }
+    //
+    // const guards = route.routeConfig?.canDeactivate ?? [];
+    // const guardInstances: any = guards.map(g => this.injector.get(g));
+    // const result = await firstValueFrom(guardInstances.canDeactivate(componentInstance))
+    //
+    // console.log(componentInstance)
+    // console.log(guardInstances)
+    // console.log(result)
+    // console.log(guards)
+    // console.log(componentRef)
+    // console.log(this.router)
+    // console.log(this.activatedRoute)
+
+    // this.tabsSvc.preventOpenTab$.next(true)
+    // this.tabsSvc.closeTab(index, this.activeIndex);
   }
 
   onActiveChange(index: number) {
-    console.log(index);
+    // console.log(index);
     this.tabsSvc.activeIndex$.next(index);
     let route = this.tabs[index] ? this.tabs[index].route : '/';
     this.tabsSvc.saveState();
