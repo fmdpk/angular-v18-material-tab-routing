@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, OnDestroy, OnInit, signal} from '@angular/core';
 import {FeatureAService} from '../../core/services/feature-a.service';
 import {CanDeactivateComponent} from '../../guards/unsaved-changes.guard';
 import {FormsModule} from '@angular/forms';
@@ -15,13 +15,10 @@ import {FormsModule} from '@angular/forms';
 })
 export class FeatureAComponent implements OnInit, CanDeactivateComponent, OnDestroy {
   title = signal('feature-a')
-  svc = inject(FeatureAService);
   formValue = '';
   savedValue = '';
 
   ngOnInit() {
-    console.log('Service instance ID', this.svc)
-    console.log(this.svc.counter++)
     setTimeout(() => {
       this.title.set('feature-a after 2 sec')
     }, 2000)

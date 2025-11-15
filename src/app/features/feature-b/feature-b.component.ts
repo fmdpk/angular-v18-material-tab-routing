@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import {Component, inject, OnDestroy} from '@angular/core';
 import {TabInfo, TabsStateService} from '../../tabs-page/tabs-state.service';
 import { Router, RouterOutlet } from '@angular/router';
 import {FeatureBService} from '../../core/services/feature-b.service';
@@ -11,7 +11,7 @@ import {FeatureBService} from '../../core/services/feature-b.service';
   styleUrl: './feature-b.component.scss',
   providers: [FeatureBService],
 })
-export class FeatureBComponent {
+export class FeatureBComponent implements OnDestroy{
   // tabsStateService = inject(TabsStateService);
   router: Router = inject(Router);
   tabsStateService: TabsStateService = inject(TabsStateService);
@@ -38,14 +38,6 @@ export class FeatureBComponent {
   }
 
   goToDetail(event: MouseEvent, item: TabInfo, index: number) {
-    // await this.tabsStateService.openTab(
-    //   item.key,
-    //   item.title,
-    //   // item.component,
-    //   item.route,
-    //   item.isDetail,
-    //   { title: index + 1 }
-    // );
     (event.target as HTMLElement).blur();
     this.tabsStateService.tabData$.next({
       key: item.key,
