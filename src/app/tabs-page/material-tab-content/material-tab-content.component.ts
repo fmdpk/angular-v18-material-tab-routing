@@ -30,7 +30,6 @@ export class MaterialTabContentComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit() {
-    // console.log(this.componentData);
     if (this.componentType) {
       const compRef = this.container.createComponent(this.componentType);
       let activeComps = this.tabsStateService.activeComponents$.getValue()
@@ -41,10 +40,7 @@ export class MaterialTabContentComponent implements AfterViewInit, OnInit {
       })
       this.tabsStateService.activeComponents$.next(activeComps)
       if (this.componentData) {
-        // console.log(compRef);
-        // console.log(compRef.instance);
         compRef.instance.data = this.componentData;
-        // Object.assign(compRef.instance.data, this.componentData);
       }
     }
   }
