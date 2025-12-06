@@ -31,7 +31,7 @@ export class TabsPageComponent implements OnInit{
 
   ngOnInit() {
     if(this.isBrowser){
-      this.tabsSvc.loadState();
+      // this.tabsSvc.loadState();
       this.tabsSvc.syncRouter();
     }
   }
