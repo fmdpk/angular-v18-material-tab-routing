@@ -1,6 +1,6 @@
-import { Injectable, Type} from '@angular/core';
-import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import {Injectable, Type} from '@angular/core';
+import {Router} from '@angular/router';
+import {BehaviorSubject} from 'rxjs';
 
 export interface TabInfo {
   key: string; // feature key
@@ -11,9 +11,13 @@ export interface TabInfo {
   data: any;
 }
 
-export interface activeTabs {   tabKey: any;   path: string;   component: Type<any>; }
+export interface activeTabs {
+  tabKey: any;
+  path: string;
+  component: Type<any>;
+}
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class TabsStateService {
   tabs$: BehaviorSubject<TabInfo[]> = new BehaviorSubject<TabInfo[]>([]);
   tabData$: BehaviorSubject<TabInfo | null> = new BehaviorSubject<TabInfo | null>(null);
@@ -21,7 +25,8 @@ export class TabsStateService {
   activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
   activeComponents$: BehaviorSubject<activeTabs[]> = new BehaviorSubject<activeTabs[]>([]);
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+  }
 
   async openTab(data: {
     key: string,
@@ -35,7 +40,14 @@ export class TabsStateService {
     const existing = this.tabs$.getValue().find((t) => t.key === data.key);
     if (!existing) {
       let tabs = this.tabs$.getValue();
-      tabs.push({ key: data.key, title: data.title, component: data.component, route: data.route, isDetail: data.isDetail, data: data.data });
+      tabs.push({
+        key: data.key,
+        title: data.title,
+        component: data.component,
+        route: data.route,
+        isDetail: data.isDetail,
+        data: data.data
+      });
       this.tabs$.next(tabs);
       this.activeIndex$.next(tabs.length - 1);
     } else {
@@ -49,6 +61,18 @@ export class TabsStateService {
 
   closeTab(itemIndex: number) {
     let tabs = this.tabs$.getValue();
+    let canChangeRoute: boolean = false
+    // console.log(itemIndex)
+    // console.log(this.activeIndex$.getValue())
+    // console.log(this.tabs$.getValue().length)
+    // console.log(this.tabs$.getValue().length - 1 > itemIndex)
+    if (this.activeIndex$.getValue() === itemIndex && this.tabs$.getValue().length && this.tabs$.getValue().length - 1 > itemIndex) {
+      console.log('canChangeRoute')
+      canChangeRoute = true
+    }
     this.tabs$.next(tabs.filter((item, index) => index !== itemIndex));
+    if (canChangeRoute) {
+      this.syncRouter(this.tabs$.getValue()[itemIndex].route)
+    }
   }
 }

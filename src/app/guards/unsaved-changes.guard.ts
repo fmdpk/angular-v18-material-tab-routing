@@ -14,6 +14,7 @@ export class UnsavedChangesGuard implements CanDeactivate<CanDeactivateComponent
 
   canDeactivate(component: CanDeactivateComponent): Observable<boolean> {
     const result = component.canDeactivate();
+    console.log(result)
     if (typeof result === 'boolean') {
       return result ? of(true) : this.confirm();
     }

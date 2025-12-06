@@ -76,11 +76,14 @@ export class TabsPageComponent implements OnInit {
       isDetail: false,
       data: {}
     })
+    this.tabsSvc.preventOpenTab$.next(false)
     this.router.navigateByUrl(route)
   }
 
   async canCLoseTab(tab: TabInfo, index: number) {
     let foundTab = this.tabsSvc.activeComponents$.getValue().find(item => item.tabKey === tab.key)
+    // console.log(foundTab)
+    // console.log('canDeactivate' in foundTab?.component!)
     if ('canDeactivate' in foundTab?.component!) {
       const guard = this.injector.get(UnsavedChangesGuard);
       const result = await firstValueFrom(guard.canDeactivate(foundTab?.component))
@@ -97,13 +100,16 @@ export class TabsPageComponent implements OnInit {
     this.tabsSvc.closeTab(index);
   }
 
-  async onActiveChange(index: number) {
-    this.tabsSvc.activeIndex$.next(index);
+  onActiveChange(index: number) {
+    // console.log(index)
     let route = this.tabs[index] ? this.tabs[index].route : '/';
-    await this.tabsSvc.syncRouter(route);
+    this.tabsSvc.syncRouter(route).then(res => {
+      this.tabsSvc.activeIndex$.next(index);
+    });
   }
 
   drop(event: CdkDragDrop<any[]>) {
+    console.log('drop')
     moveItemInArray(this.tabs, event.previousIndex, event.currentIndex);
     if (this.activeIndex === event.previousIndex) {
       this.tabsSvc.activeIndex$.next(event.currentIndex);
