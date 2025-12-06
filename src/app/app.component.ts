@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
   menuItems: MENU_ITEM_INTERFACE[] = JSON.parse(JSON.stringify(MENU_ITEMS))
 
   ngOnInit() {
-    let component: Type<any> | null = null
+    let component: Type<Component> | null = null
     this.router.events.subscribe((res) => {
       if (res instanceof ActivationEnd) {
         if (!res.snapshot.firstChild) {
@@ -38,9 +38,8 @@ export class AppComponent implements OnInit {
           this.tabsStateService.openTab(data)
         } else if (!data && !this.tabsStateService.preventOpenTab$.getValue()) {
           this.createTabOnPageLoad(component, res.url)
-        } else if (this.tabsStateService.preventOpenTab$.getValue()) {
-          this.tabsStateService.preventOpenTab$.next(false)
         }
+        this.tabsStateService.preventOpenTab$.next(false)
       }
     });
   }

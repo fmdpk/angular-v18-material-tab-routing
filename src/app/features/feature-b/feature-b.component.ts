@@ -49,6 +49,7 @@ export class FeatureBComponent implements OnDestroy{
         title: index + 1
       }
     })
+    this.tabsStateService.preventOpenTab$.next(false)
     this.router.navigateByUrl(item.route)
   }
 

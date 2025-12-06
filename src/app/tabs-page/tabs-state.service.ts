@@ -61,18 +61,14 @@ export class TabsStateService {
 
   closeTab(itemIndex: number) {
     let tabs = this.tabs$.getValue();
-    let canChangeRoute: boolean = false
-    // console.log(itemIndex)
-    // console.log(this.activeIndex$.getValue())
-    // console.log(this.tabs$.getValue().length)
-    // console.log(this.tabs$.getValue().length - 1 > itemIndex)
-    if (this.activeIndex$.getValue() === itemIndex && this.tabs$.getValue().length && this.tabs$.getValue().length - 1 > itemIndex) {
-      console.log('canChangeRoute')
-      canChangeRoute = true
-    }
+    let canChangeRoute: boolean = this.changeRoute(itemIndex)
     this.tabs$.next(tabs.filter((item, index) => index !== itemIndex));
     if (canChangeRoute) {
       this.syncRouter(this.tabs$.getValue()[itemIndex].route)
     }
+  }
+
+  changeRoute(itemIndex: number): boolean{
+    return this.activeIndex$.getValue() === itemIndex && this.tabs$.getValue().length > 0 && this.tabs$.getValue().length - 1 > itemIndex
   }
 }

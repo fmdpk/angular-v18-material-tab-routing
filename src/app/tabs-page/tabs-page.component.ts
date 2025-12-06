@@ -7,7 +7,7 @@ import {
   OnInit,
   PLATFORM_ID,
 } from '@angular/core';
-import {MatTabChangeEvent, MatTabsModule} from '@angular/material/tabs';
+import {MatTabsModule} from '@angular/material/tabs';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {
@@ -47,28 +47,36 @@ export class TabsPageComponent implements OnInit {
   tabs: TabInfo[] = [];
 
   constructor(
-    public tabsSvc: TabsStateService,
+    public tabsStateService: TabsStateService,
     @Inject(Injector) private injector: any,
   ) {
   }
 
   ngOnInit() {
     if (this.isBrowser) {
-      this.tabsSvc.tabs$
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((res) => {
-          this.tabs = res;
-        });
-      this.tabsSvc.activeIndex$
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((res) => {
-          this.activeIndex = res;
-        });
+      this.syncTabs()
+      this.syncActiveIndex()
     }
   }
 
+  syncTabs() {
+    this.tabsStateService.tabs$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        this.tabs = res;
+      });
+  }
+
+  syncActiveIndex() {
+    this.tabsStateService.activeIndex$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        this.activeIndex = res;
+      });
+  }
+
   open(key: string, title: string, component: any, route: string) {
-    this.tabsSvc.tabData$.next({
+    this.tabsStateService.tabData$.next({
       key,
       title,
       component,
@@ -76,14 +84,12 @@ export class TabsPageComponent implements OnInit {
       isDetail: false,
       data: {}
     })
-    this.tabsSvc.preventOpenTab$.next(false)
+    this.tabsStateService.preventOpenTab$.next(false)
     this.router.navigateByUrl(route)
   }
 
   async canCLoseTab(tab: TabInfo, index: number) {
-    let foundTab = this.tabsSvc.activeComponents$.getValue().find(item => item.tabKey === tab.key)
-    // console.log(foundTab)
-    // console.log('canDeactivate' in foundTab?.component!)
+    let foundTab = this.tabsStateService.activeComponents$.getValue().find(item => item.tabKey === tab.key)
     if ('canDeactivate' in foundTab?.component!) {
       const guard = this.injector.get(UnsavedChangesGuard);
       const result = await firstValueFrom(guard.canDeactivate(foundTab?.component))
@@ -96,31 +102,30 @@ export class TabsPageComponent implements OnInit {
   }
 
   closeTab(index: number) {
-    this.tabsSvc.preventOpenTab$.next(true)
-    this.tabsSvc.closeTab(index);
+    this.tabsStateService.preventOpenTab$.next(true)
+    this.tabsStateService.closeTab(index);
   }
 
   onActiveChange(index: number) {
-    // console.log(index)
     let route = this.tabs[index] ? this.tabs[index].route : '/';
-    this.tabsSvc.syncRouter(route).then(res => {
-      this.tabsSvc.activeIndex$.next(index);
+    this.tabsStateService.preventOpenTab$.next(true)
+    this.tabsStateService.syncRouter(route).then(res => {
+      this.tabsStateService.activeIndex$.next(index);
     });
   }
 
   drop(event: CdkDragDrop<any[]>) {
-    console.log('drop')
     moveItemInArray(this.tabs, event.previousIndex, event.currentIndex);
     if (this.activeIndex === event.previousIndex) {
-      this.tabsSvc.activeIndex$.next(event.currentIndex);
+      this.tabsStateService.activeIndex$.next(event.currentIndex);
     } else if (
       this.activeIndex > Math.min(event.previousIndex, event.currentIndex) &&
       this.activeIndex <= Math.max(event.previousIndex, event.currentIndex)
     ) {
-      this.tabsSvc.activeIndex$.next(
+      this.tabsStateService.activeIndex$.next(
         event.previousIndex < event.currentIndex
-          ? this.tabsSvc.activeIndex$.getValue() - 1
-          : this.tabsSvc.activeIndex$.getValue() + 1
+          ? this.tabsStateService.activeIndex$.getValue() - 1
+          : this.tabsStateService.activeIndex$.getValue() + 1
       );
     }
   }
