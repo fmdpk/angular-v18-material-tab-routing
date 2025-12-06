@@ -69,9 +69,7 @@ export class TabsStateService {
     let canChangeRoute: boolean = this.changeRoute(itemIndex)
     this.tabs$.next(tabs.filter((item, index) => index !== itemIndex));
     if (canChangeRoute) {
-      this.syncRouter(this.tabs$.getValue()[itemIndex].route).then(res => {
-        this.isRemovingTab = false
-      })
+      this.syncRouter(this.tabs$.getValue()[itemIndex].route)
     }
   }
 
