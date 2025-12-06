@@ -40,7 +40,7 @@ export class FeatureBComponent implements OnDestroy{
   goToDetail(event: MouseEvent, item: TabInfo, index: number) {
     (event.target as HTMLElement).blur();
     this.tabsStateService.tabData$.next({
-      key: item.key,
+      key: item.title,
       title: item.title,
       component: null,
       route: item.route,

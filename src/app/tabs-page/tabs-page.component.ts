@@ -75,9 +75,9 @@ export class TabsPageComponent implements OnInit {
       });
   }
 
-  open(key: string, title: string, route: string) {
+  open(title: string, route: string) {
     this.tabsStateService.tabData$.next({
-      key,
+      key: title,
       title,
       component: null,
       route,

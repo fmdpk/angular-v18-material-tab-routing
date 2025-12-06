@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
             child.data = {
               [key]: split[1]
             }
-            child.key = child.key + '-' + split[1]
+            child.key = child.title + ' ' + split[1]
             child.title = child.title + ' ' + split[1]
             this.openTab(child, component)
           }

@@ -7,7 +7,7 @@ export interface MENU_ITEM_INTERFACE extends TabInfo {
 
 export const MENU_ITEMS: MENU_ITEM_INTERFACE[] = [
   {
-    key: 'feature-a',
+    key: 'Feature A',
     title: 'Feature A',
     route: '/tabs/feature-a',
     component: null,
@@ -16,14 +16,14 @@ export const MENU_ITEMS: MENU_ITEM_INTERFACE[] = [
     data: {}
   },
   {
-    key: 'feature-b',
+    key: 'Feature B',
     title: 'Feature B',
     route: '/tabs/feature-b',
     component: null,
     isDetail: false,
     children: [
       {
-        key: 'item',
+        key: 'Item-Detail',
         title: 'Item',
         route: '/tabs/feature-b/',
         param: 'title',
@@ -36,7 +36,7 @@ export const MENU_ITEMS: MENU_ITEM_INTERFACE[] = [
     data: {}
   },
   {
-    key: 'feature-c',
+    key: 'Feature C',
     title: 'Feature C',
     route: '/tabs/feature-c',
     component: null,
