@@ -1,5 +1,5 @@
 import {Component, inject, OnInit, Type} from '@angular/core';
-import {ActivationEnd, NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {ActivationEnd, NavigationEnd, NavigationSkipped, Router, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -33,13 +33,12 @@ export class AppComponent implements OnInit {
         }
       } else if (res instanceof NavigationEnd) {
         let data: TabInfo = JSON.parse(JSON.stringify(this.tabsStateService.tabData$.getValue()))
-        if (data && !this.tabsStateService.preventOpenTab$.getValue()) {
+        if (data) {
           data.component = component
           this.tabsStateService.openTab(data)
-        } else if (!data && !this.tabsStateService.preventOpenTab$.getValue()) {
+        } else {
           this.createTabOnPageLoad(component, res.url)
         }
-        this.tabsStateService.preventOpenTab$.next(false)
       }
     });
   }

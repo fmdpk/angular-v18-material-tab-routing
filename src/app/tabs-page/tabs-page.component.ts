@@ -63,6 +63,7 @@ export class TabsPageComponent implements OnInit {
     this.tabsStateService.tabs$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
+        console.log(res)
         this.tabs = res;
       });
   }
@@ -84,7 +85,6 @@ export class TabsPageComponent implements OnInit {
       isDetail: false,
       data: {}
     })
-    this.tabsStateService.preventOpenTab$.next(false)
     this.router.navigateByUrl(route)
   }
 
@@ -102,13 +102,13 @@ export class TabsPageComponent implements OnInit {
   }
 
   closeTab(index: number) {
-    this.tabsStateService.preventOpenTab$.next(true)
+    // this.tabsStateService.preventOpenTab$.next(true)
     this.tabsStateService.closeTab(index);
   }
 
   onActiveChange(index: number) {
     let route = this.tabs[index] ? this.tabs[index].route : '/';
-    this.tabsStateService.preventOpenTab$.next(true)
+    // this.tabsStateService.preventOpenTab$.next(true)
     this.tabsStateService.syncRouter(route).then(res => {
       this.tabsStateService.activeIndex$.next(index);
     });

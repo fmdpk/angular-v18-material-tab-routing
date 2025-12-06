@@ -21,9 +21,9 @@ export interface activeTabs {
 export class TabsStateService {
   tabs$: BehaviorSubject<TabInfo[]> = new BehaviorSubject<TabInfo[]>([]);
   tabData$: BehaviorSubject<TabInfo | null> = new BehaviorSubject<TabInfo | null>(null);
-  preventOpenTab$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
   activeComponents$: BehaviorSubject<activeTabs[]> = new BehaviorSubject<activeTabs[]>([]);
+  isRemovingTab: boolean = false
 
   constructor(private router: Router) {
   }
@@ -36,22 +36,26 @@ export class TabsStateService {
     isDetail: boolean,
     data: any
   }) {
-    // console.log(data)
-    const existing = this.tabs$.getValue().find((t) => t.key === data.key);
-    if (!existing) {
-      let tabs = this.tabs$.getValue();
-      tabs.push({
-        key: data.key,
-        title: data.title,
-        component: data.component,
-        route: data.route,
-        isDetail: data.isDetail,
-        data: data.data
-      });
-      this.tabs$.next(tabs);
-      this.activeIndex$.next(tabs.length - 1);
+    if (!this.isRemovingTab) {
+      const existing = this.tabs$.getValue().find((t) => t.key === data.key);
+      if (!existing) {
+        let tabs = this.tabs$.getValue();
+        tabs.push({
+          key: data.key,
+          title: data.title,
+          component: data.component,
+          route: data.route,
+          isDetail: data.isDetail,
+          data: data.data
+        });
+        this.tabs$.next(tabs);
+        this.activeIndex$.next(tabs.length - 1);
+      } else {
+        this.activeIndex$.next(this.tabs$.getValue().indexOf(existing));
+      }
     } else {
-      this.activeIndex$.next(this.tabs$.getValue().indexOf(existing));
+      this.isRemovingTab = false
+      return
     }
   }
 
@@ -60,15 +64,18 @@ export class TabsStateService {
   }
 
   closeTab(itemIndex: number) {
+    this.isRemovingTab = true
     let tabs = this.tabs$.getValue();
     let canChangeRoute: boolean = this.changeRoute(itemIndex)
     this.tabs$.next(tabs.filter((item, index) => index !== itemIndex));
     if (canChangeRoute) {
-      this.syncRouter(this.tabs$.getValue()[itemIndex].route)
+      this.syncRouter(this.tabs$.getValue()[itemIndex].route).then(res => {
+        this.isRemovingTab = false
+      })
     }
   }
 
-  changeRoute(itemIndex: number): boolean{
+  changeRoute(itemIndex: number): boolean {
     return this.activeIndex$.getValue() === itemIndex && this.tabs$.getValue().length > 0 && this.tabs$.getValue().length - 1 > itemIndex
   }
 }
