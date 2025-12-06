@@ -20,7 +20,7 @@ export interface activeTabs {
 @Injectable({providedIn: 'root'})
 export class TabsStateService {
   tabs$: BehaviorSubject<TabInfo[]> = new BehaviorSubject<TabInfo[]>([]);
-  tabData$: BehaviorSubject<TabInfo | null> = new BehaviorSubject<TabInfo | null>(null);
+  tabData$: BehaviorSubject<TabInfo | {}> = new BehaviorSubject<TabInfo | {}>({});
   activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
   activeComponents$: BehaviorSubject<activeTabs[]> = new BehaviorSubject<activeTabs[]>([]);
   isRemovingTab: boolean = false
@@ -50,6 +50,7 @@ export class TabsStateService {
         });
         this.tabs$.next(tabs);
         this.activeIndex$.next(tabs.length - 1);
+        this.tabData$.next({})
       } else {
         this.activeIndex$.next(this.tabs$.getValue().indexOf(existing));
       }
@@ -63,14 +64,17 @@ export class TabsStateService {
     await this.router.navigate([route]);
   }
 
-  closeTab(itemIndex: number) {
+  async closeTab(itemIndex: number, key: string) {
     this.isRemovingTab = true
     let tabs = this.tabs$.getValue();
+    let activeComponents = this.activeComponents$.getValue();
     let canChangeRoute: boolean = this.changeRoute(itemIndex)
     this.tabs$.next(tabs.filter((item, index) => index !== itemIndex));
+    this.activeComponents$.next(activeComponents.filter(item => item.tabKey !== key))
     if (canChangeRoute) {
-      this.syncRouter(this.tabs$.getValue()[itemIndex].route)
+      await this.syncRouter(this.tabs$.getValue()[itemIndex].route)
     }
+    this.isRemovingTab = false
   }
 
   changeRoute(itemIndex: number): boolean {

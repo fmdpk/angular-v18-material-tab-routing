@@ -32,18 +32,17 @@ export class AppComponent implements OnInit {
           component = res?.snapshot?.component
         }
       } else if (res instanceof NavigationEnd) {
-        let data: TabInfo = JSON.parse(JSON.stringify(this.tabsStateService.tabData$.getValue()))
-        if (data) {
-          data.component = component
-          this.tabsStateService.openTab(data)
-        } else {
-          this.createTabOnPageLoad(component, res.url)
-        }
+        this.handleOpenTab(res, component)
       }
     });
   }
 
-  createTabOnPageLoad(component: any, url: string) {
+  handleOpenTab(res: any, component: Type<Component> | null) {
+    let data: TabInfo = JSON.parse(JSON.stringify(this.tabsStateService.tabData$.getValue()))
+    this.createTab(component, res.url, data)
+  }
+
+  createTab(component: Type<Component> | null, url: string, data: TabInfo) {
     this.menuItems.forEach(item => {
       if (item.route === url && url.length <= item.route.length) {
         this.openTab(item, component)
@@ -51,18 +50,30 @@ export class AppComponent implements OnInit {
       } else if (item.children.length) {
         item.children.forEach(child => {
           if (url.includes(child.route)) {
-            let split = url.split(child.route)
-            const key: string = child.param!
-            child.data = {
-              [key]: split[1]
-            }
-            child.key = child.title + ' ' + split[1]
-            child.title = child.title + ' ' + split[1]
-            this.openTab(child, component)
+            let clonedChild = JSON.parse(JSON.stringify(child))
+            clonedChild = this.createTabData({clonedChild, url, child, data})
+            this.openTab(clonedChild, component)
           }
         })
       }
     })
+  }
+
+  createTabData(args: {clonedChild: MENU_ITEM_INTERFACE, url: string, child: MENU_ITEM_INTERFACE, data: TabInfo}){
+    let split = args.url.split(args.child.route)
+    if (args.data?.data) {
+      args.clonedChild.data = args.data.data
+    } else {
+      const key: string = args.child.param!
+      args.clonedChild.data = {
+        [key]: split[1]
+      }
+    }
+    args.clonedChild.isDetail = args.data.isDetail ? args.data.isDetail : split.length > 1;
+    args.clonedChild.key = args.url
+    args.clonedChild.route = args.url
+    args.clonedChild.title = args.data.title ? args.data.title : (args.child.title + ' ' + split[1]);
+    return args.clonedChild
   }
 
   openTab(item: MENU_ITEM_INTERFACE, component: any) {

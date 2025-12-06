@@ -94,21 +94,19 @@ export class TabsPageComponent implements OnInit {
       const guard = this.injector.get(UnsavedChangesGuard);
       const result = await firstValueFrom(guard.canDeactivate(foundTab?.component))
       if (result) {
-        this.closeTab(index)
+        this.closeTab(index, tab.key)
       }
     } else {
-      this.closeTab(index)
+      this.closeTab(index, tab.key)
     }
   }
 
-  closeTab(index: number) {
-    // this.tabsStateService.preventOpenTab$.next(true)
-    this.tabsStateService.closeTab(index);
+  closeTab(index: number, key: string) {
+    this.tabsStateService.closeTab(index, key);
   }
 
   onActiveChange(index: number) {
     let route = this.tabs[index] ? this.tabs[index].route : '/';
-    // this.tabsStateService.preventOpenTab$.next(true)
     this.tabsStateService.syncRouter(route).then(res => {
       this.tabsStateService.activeIndex$.next(index);
     });
