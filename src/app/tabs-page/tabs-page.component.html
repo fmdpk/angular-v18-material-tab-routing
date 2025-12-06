@@ -2,7 +2,7 @@
   <button
     mat-button
     (click)="
-      open('feature-a', 'Feature A', 'FeatureAComponent', '/tabs/feature-a')
+      open('feature-a', 'Feature A', '/tabs/feature-a')
     "
   >
     Feature A
@@ -10,7 +10,7 @@
   <button
     mat-button
     (click)="
-      open('feature-b', 'Feature B', 'FeatureBComponent', '/tabs/feature-b')
+      open('feature-b', 'Feature B', '/tabs/feature-b')
     "
   >
     Feature B
@@ -18,7 +18,7 @@
   <button
     mat-button
     (click)="
-      open('feature-c', 'Feature C', 'FeatureCComponent', '/tabs/feature-c')
+      open('feature-c', 'Feature C', '/tabs/feature-c')
     "
   >
     Feature C
@@ -54,7 +54,7 @@
           </button>
         </div>
       </ng-template>
-      @defer (when tabs.length){
+      @defer (when tabs.length) {
         <app-material-tab-content
           [tabKey]="tab.key"
           [componentData]="tab.data"

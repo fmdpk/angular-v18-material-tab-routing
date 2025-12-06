@@ -10,7 +10,7 @@ export const MENU_ITEMS: MENU_ITEM_INTERFACE[] = [
     key: 'feature-a',
     title: 'Feature A',
     route: '/tabs/feature-a',
-    component: '',
+    component: null,
     isDetail: false,
     children: [],
     data: {}
@@ -19,7 +19,7 @@ export const MENU_ITEMS: MENU_ITEM_INTERFACE[] = [
     key: 'feature-b',
     title: 'Feature B',
     route: '/tabs/feature-b',
-    component: '',
+    component: null,
     isDetail: false,
     children: [
       {
@@ -27,7 +27,7 @@ export const MENU_ITEMS: MENU_ITEM_INTERFACE[] = [
         title: 'Item',
         route: '/tabs/feature-b/',
         param: 'title',
-        component: '',
+        component: null,
         isDetail: true,
         children: [],
         data: {},
@@ -39,7 +39,7 @@ export const MENU_ITEMS: MENU_ITEM_INTERFACE[] = [
     key: 'feature-c',
     title: 'Feature C',
     route: '/tabs/feature-c',
-    component: '',
+    component: null,
     isDetail: false,
     children: [],
     data: {}

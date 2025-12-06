@@ -42,7 +42,7 @@ export class FeatureBComponent implements OnDestroy{
     this.tabsStateService.tabData$.next({
       key: item.key,
       title: item.title,
-      component: '',
+      component: null,
       route: item.route,
       isDetail: item.isDetail,
       data: {
