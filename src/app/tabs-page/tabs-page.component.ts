@@ -15,13 +15,13 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import {isPlatformBrowser, NgForOf, NgIf} from '@angular/common';
-import {Router, RouterOutlet} from '@angular/router';
+import {isPlatformBrowser} from '@angular/common';
+import {Router} from '@angular/router';
 import {TabInfo, TabsStateService} from './tabs-state.service';
 import {MaterialTabContentComponent} from './material-tab-content/material-tab-content.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {firstValueFrom} from 'rxjs';
-import {UnsavedChangesGuard} from '../guards/unsaved-changes.guard';
+import {BidiModule} from '@angular/cdk/bidi';
 
 @Component({
   selector: 'app-tabs-page',
@@ -31,10 +31,8 @@ import {UnsavedChangesGuard} from '../guards/unsaved-changes.guard';
     MatButtonModule,
     MatIconModule,
     DragDropModule,
-    NgForOf,
-    RouterOutlet,
-    NgIf,
     MaterialTabContentComponent,
+    BidiModule,
   ],
   templateUrl: './tabs-page.component.html',
   styleUrl: './tabs-page.component.scss',
@@ -45,6 +43,9 @@ export class TabsPageComponent implements OnInit {
   router: Router = inject(Router);
   activeIndex: number = -1;
   tabs: TabInfo[] = [];
+  direction: 'rtl' | 'ltr' = 'rtl'
+  dragClientY: number = 0
+  dynamicTabIndex = 'dynamictabindex'
 
   constructor(
     public tabsStateService: TabsStateService,
@@ -63,9 +64,22 @@ export class TabsPageComponent implements OnInit {
     this.tabsStateService.tabs$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        console.log(res)
         this.tabs = res;
+        setTimeout(() => {
+          this.modifyTabElements()
+        })
       });
+  }
+
+  modifyTabElements() {
+    let elements: NodeListOf<Element> = document.querySelectorAll('.mdc-tab')
+    elements.forEach((item: Element) => {
+      let list: NodeListOf<Element> = item.querySelectorAll('.custom-mat-tab-header-wrapper')
+      if (list) {
+        const index = list[0].attributes.getNamedItem(`data-${this.dynamicTabIndex}`)?.value
+        item.setAttribute(`data-${this.dynamicTabIndex}`, index!)
+      }
+    })
   }
 
   syncActiveIndex() {
@@ -89,9 +103,9 @@ export class TabsPageComponent implements OnInit {
   }
 
   async canCLoseTab(tab: TabInfo, index: number) {
-    let foundTab = this.tabsStateService.activeComponents$.getValue().find(item => item.tabKey === tab.key)
-    if ('canDeactivate' in foundTab?.component!) {
-      const guard = this.injector.get(UnsavedChangesGuard);
+    const foundTab = this.tabsStateService.activeComponents$.getValue().find(item => item.tabKey === tab.key);
+    if (foundTab && foundTab.canDeactivateGuard) {
+      const guard = this.injector.get(foundTab.canDeactivateGuard);
       const result = await firstValueFrom(guard.canDeactivate(foundTab?.component))
       if (result) {
         this.closeTab(index, tab.key)
@@ -113,18 +127,57 @@ export class TabsPageComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.tabs, event.previousIndex, event.currentIndex);
-    if (this.activeIndex === event.previousIndex) {
-      this.tabsStateService.activeIndex$.next(event.currentIndex);
+    const {x, y} = event.dropPoint;
+
+    // Find the element under the pointer(target element)
+    let targetElement = document.elementFromPoint(x, this.dragClientY) as HTMLElement;
+    if (!targetElement) return;
+
+    // Find source element(dragged element)
+    let sourceElement = event.item.element.nativeElement as HTMLElement;
+    if (!sourceElement) return;
+
+    const targetIndex = this.getElementData(targetElement)
+    const sourceIndex = this.getElementData(sourceElement);
+
+    if ((targetIndex === sourceIndex) || targetIndex < 0 || sourceIndex < 0) return;
+    moveItemInArray(this.tabs, sourceIndex, targetIndex);
+    this.tabsStateService.tabs$.next(this.tabs)
+    if (this.activeIndex === sourceIndex) {
+      this.tabsStateService.activeIndex$.next(targetIndex);
     } else if (
-      this.activeIndex > Math.min(event.previousIndex, event.currentIndex) &&
-      this.activeIndex <= Math.max(event.previousIndex, event.currentIndex)
+      this.activeIndex > Math.min(sourceIndex, targetIndex) &&
+      this.activeIndex <= Math.max(sourceIndex, targetIndex)
     ) {
       this.tabsStateService.activeIndex$.next(
-        event.previousIndex < event.currentIndex
+        sourceIndex < targetIndex
           ? this.tabsStateService.activeIndex$.getValue() - 1
           : this.tabsStateService.activeIndex$.getValue() + 1
       );
     }
+  }
+
+  getElementData(targetElement: HTMLElement) {
+    let flag = true
+    let result = -1
+    while (flag) {
+      if (targetElement.dataset[this.dynamicTabIndex]) {
+        result = Number(targetElement.dataset[this.dynamicTabIndex])
+      }
+      if (result > -1) {
+        flag = false
+      } else if (flag) {
+        if (targetElement.parentElement && !targetElement.parentElement.classList.contains('mdc-tab')) {
+          targetElement = targetElement.parentElement
+        } else {
+          flag = false
+        }
+      }
+    }
+    return result
+  }
+
+  getStart(event: any) {
+    this.dragClientY = event.event.clientY
   }
 }

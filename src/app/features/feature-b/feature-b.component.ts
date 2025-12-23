@@ -1,12 +1,11 @@
 import {Component, inject, OnDestroy} from '@angular/core';
 import {TabInfo, TabsStateService} from '../../tabs-page/tabs-state.service';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router} from '@angular/router';
 import {FeatureBService} from '../../core/services/feature-b.service';
 
 @Component({
   selector: 'app-feature-b',
   standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './feature-b.component.html',
   styleUrl: './feature-b.component.scss',
   providers: [FeatureBService],

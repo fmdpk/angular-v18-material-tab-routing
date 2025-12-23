@@ -25,43 +25,59 @@
   </button>
 </div>
 
-<mat-tab-group
-  cdkDropList
-  cdkDropListOrientation="horizontal"
-  (cdkDropListDropped)="drop($event)"
-  cdkDropListElementContainer=".mat-mdc-tab-labels"
-  class="example-drag-tabs"
-  [mat-stretch-tabs]="false"
-  [(selectedIndex)]="activeIndex"
-  (selectedIndexChange)="onActiveChange($event)"
->
-  @for (tab of tabs; let i = $index; track tab.key) {
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <div class="custom-mat-tab-header-wrapper">
-        <span
-          cdkDrag
-          cdkDragPreviewClass="example-drag-tabs-preview"
-          cdkDragRootElement=".mat-mdc-tab"
-        >{{ tab.title }}</span
-        >
-          <button
-            mat-icon-button
-            (click)="$event.stopPropagation(); canCLoseTab(tab,i)"
-            aria-label="Close tab"
-          >
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-      </ng-template>
-      @defer (when tabs.length) {
-        <app-material-tab-content
-          [tabKey]="tab.key"
-          [componentData]="tab.data"
-          [componentType]="tab.component"
-        ></app-material-tab-content>
-      }
-      <!-- <router-outlet *ngIf="tab.isDetail"></router-outlet> -->
-    </mat-tab>
-  }
-</mat-tab-group>
+<div [dir]="direction">
+  <mat-tab-group
+    cdkDropList
+    cdkDropListOrientation="horizontal"
+    [cdkDropListData]="tabs"
+    cdkDropListLockAxis="x"
+    (cdkDropListDropped)="drop($event)"
+    cdkDropListElementContainer=".mat-mdc-tab-labels"
+    class="example-drag-tabs"
+    [mat-stretch-tabs]="false"
+    [(selectedIndex)]="activeIndex"
+    (selectedIndexChange)="onActiveChange($event)"
+  >
+    @for (tab of tabs; let i = $index; track tab.key) {
+      <mat-tab [attr.id]="i"
+        [attr.tabIndex]="i"
+        [attr.data-dynamicTabIndex]="i">
+        <ng-template mat-tab-label>
+          <div [attr.id]="i"
+               [attr.tabIndex]="i"
+               [attr.data-dynamicTabIndex]="i" class="custom-mat-tab-header-wrapper">
+            <span
+              [attr.id]="i"
+              [attr.tabIndex]="i"
+              [attr.data-dynamicTabIndex]="i"
+              cdkDrag
+              (cdkDragStarted)="getStart($event)"
+              cdkDragPreviewClass="example-drag-tabs-preview"
+              cdkDragRootElement=".mat-mdc-tab">
+              {{ tab.title }}
+            </span>
+            <button
+              [attr.id]="i"
+              [attr.tabIndex]="i"
+              [attr.data-dynamicTabIndex]="i"
+              mat-icon-button
+              (click)="$event.stopPropagation(); canCLoseTab(tab,i)"
+              aria-label="Close tab">
+              <mat-icon [attr.id]="i"
+                        [attr.tabIndex]="i"
+                        [attr.data-dynamicTabIndex]="i">close</mat-icon>
+            </button>
+          </div>
+        </ng-template>
+        @defer (when tabs.length) {
+          <app-material-tab-content
+            [tabKey]="tab.key"
+            [componentData]="tab.data"
+            [componentType]="tab.component"
+          ></app-material-tab-content>
+        }
+        <!-- <router-outlet *ngIf="tab.isDetail"></router-outlet> -->
+      </mat-tab>
+    }
+  </mat-tab-group>
+</div>

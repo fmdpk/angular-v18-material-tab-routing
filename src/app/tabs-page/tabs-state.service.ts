@@ -11,10 +11,11 @@ export interface TabInfo {
   data: any;
 }
 
-export interface activeTabs {
+export interface ActiveTabs {
   tabKey: any;
   path: string;
   component: Type<any>;
+  canDeactivateGuard: any
 }
 
 @Injectable({providedIn: 'root'})
@@ -22,7 +23,7 @@ export class TabsStateService {
   tabs$: BehaviorSubject<TabInfo[]> = new BehaviorSubject<TabInfo[]>([]);
   tabData$: BehaviorSubject<TabInfo | {}> = new BehaviorSubject<TabInfo | {}>({});
   activeIndex$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
-  activeComponents$: BehaviorSubject<activeTabs[]> = new BehaviorSubject<activeTabs[]>([]);
+  activeComponents$: BehaviorSubject<ActiveTabs[]> = new BehaviorSubject<ActiveTabs[]>([]);
   isRemovingTab: boolean = false
 
   constructor(private router: Router) {
