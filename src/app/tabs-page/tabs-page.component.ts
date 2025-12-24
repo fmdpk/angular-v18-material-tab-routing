@@ -127,19 +127,8 @@ export class TabsPageComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<any[]>) {
-    const {x, y} = event.dropPoint;
-
-    // Find the element under the pointer(target element)
-    let targetElement = document.elementFromPoint(x, this.dragClientY) as HTMLElement;
-    if (!targetElement) return;
-
-    // Find source element(dragged element)
-    let sourceElement = event.item.element.nativeElement as HTMLElement;
-    if (!sourceElement) return;
-
-    const targetIndex = this.getElementData(targetElement)
-    const sourceIndex = this.getElementData(sourceElement);
-
+    const targetIndex = this.tabs.length - 1 - event.currentIndex
+    const sourceIndex = +event.item.element.nativeElement.dataset[this.dynamicTabIndex]!;
     if ((targetIndex === sourceIndex) || targetIndex < 0 || sourceIndex < 0) return;
     moveItemInArray(this.tabs, sourceIndex, targetIndex);
     this.tabsStateService.tabs$.next(this.tabs)
@@ -155,26 +144,6 @@ export class TabsPageComponent implements OnInit {
           : this.tabsStateService.activeIndex$.getValue() + 1
       );
     }
-  }
-
-  getElementData(targetElement: HTMLElement) {
-    let flag = true
-    let result = -1
-    while (flag) {
-      if (targetElement.dataset[this.dynamicTabIndex]) {
-        result = Number(targetElement.dataset[this.dynamicTabIndex])
-      }
-      if (result > -1) {
-        flag = false
-      } else if (flag) {
-        if (targetElement.parentElement && !targetElement.parentElement.classList.contains('mdc-tab')) {
-          targetElement = targetElement.parentElement
-        } else {
-          flag = false
-        }
-      }
-    }
-    return result
   }
 
   getStart(event: any) {
