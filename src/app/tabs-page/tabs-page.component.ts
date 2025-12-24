@@ -44,7 +44,6 @@ export class TabsPageComponent implements OnInit {
   activeIndex: number = -1;
   tabs: TabInfo[] = [];
   direction: 'rtl' | 'ltr' = 'rtl'
-  dragClientY: number = 0
   dynamicTabIndex = 'dynamictabindex'
 
   constructor(
@@ -65,21 +64,7 @@ export class TabsPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
         this.tabs = res;
-        setTimeout(() => {
-          this.modifyTabElements()
-        })
       });
-  }
-
-  modifyTabElements() {
-    let elements: NodeListOf<Element> = document.querySelectorAll('.mdc-tab')
-    elements.forEach((item: Element) => {
-      let list: NodeListOf<Element> = item.querySelectorAll('.custom-mat-tab-header-wrapper')
-      if (list) {
-        const index = list[0].attributes.getNamedItem(`data-${this.dynamicTabIndex}`)?.value
-        item.setAttribute(`data-${this.dynamicTabIndex}`, index!)
-      }
-    })
   }
 
   syncActiveIndex() {
@@ -127,8 +112,8 @@ export class TabsPageComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<any[]>) {
-    const targetIndex = this.tabs.length - 1 - event.currentIndex
-    const sourceIndex = +event.item.element.nativeElement.dataset[this.dynamicTabIndex]!;
+    const targetIndex = this.direction === 'rtl' ? this.tabs.length - 1 - event.currentIndex : event.currentIndex
+    const sourceIndex = this.direction === 'rtl' ? +event.item.element.nativeElement.dataset[this.dynamicTabIndex]! : event.previousIndex;
     if ((targetIndex === sourceIndex) || targetIndex < 0 || sourceIndex < 0) return;
     moveItemInArray(this.tabs, sourceIndex, targetIndex);
     this.tabsStateService.tabs$.next(this.tabs)
@@ -144,9 +129,5 @@ export class TabsPageComponent implements OnInit {
           : this.tabsStateService.activeIndex$.getValue() + 1
       );
     }
-  }
-
-  getStart(event: any) {
-    this.dragClientY = event.event.clientY
   }
 }

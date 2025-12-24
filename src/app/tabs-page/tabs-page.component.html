@@ -51,7 +51,6 @@
               [attr.tabIndex]="i"
               [attr.data-dynamicTabIndex]="i"
               cdkDrag
-              (cdkDragStarted)="getStart($event)"
               cdkDragPreviewClass="example-drag-tabs-preview"
               cdkDragRootElement=".mat-mdc-tab">
               {{ tab.title }}
